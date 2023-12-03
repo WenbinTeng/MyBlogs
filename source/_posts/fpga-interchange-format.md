@@ -129,9 +129,13 @@ CHIPS Alliance 还提供了一个 Python 工具用于读写设备数据库、逻
 
 在物理网表中，网络（Net）将会被映射到设备上的实际布线资源（如导线、节点、可编程互联点等），并通过引脚连接到基本逻辑单元和站点。一个网络由一个或多个源节点与一个或多个汇节点组成，中间由基本逻辑单元和站点的可编程互联点和引脚进行导通。一个网络根据树状结构组织多个布线分支，一个布线分支可以由一个基本逻辑单元或站点的可编程逻辑点或引脚，以及多个布线分支构成。下图分别是逻辑网表中的逻辑网络连接和物理网表中的物理网络连接。
 
-<img src="/logical_net.png" style="width:80%;" />
+<img src="/logicalNet.png" style="width:80%;" />
 
-<img src="/physical_net.png" style="width:80%;" />
+<img src="/physicalNet.png" style="width:80%;" />
+
+下图是布线操作中各个对象之间的连接关系。
+
+<img src="/routing.png" style="width:100%;" />
 
 在 FPGAIF 官方实现中的 `fpga-interchange-schema/interchange/PhysicalNetlist.capnp` 文件可以得到物理网表模型定义，其层次关系如下图所示。
 
