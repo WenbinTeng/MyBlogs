@@ -146,3 +146,32 @@ T_n &= 2T_{n-1} + 1 \\
 \end{align*}
 $$
 
+## 汉诺塔问题拓展
+
+**问题1：**是否有一种时间复杂度为 $O(\log{n})$ 的算法计算 $T_n \bmod p$？（假设 $p<2^{64}$，从而计算 $a \bmod p, (a+b) \bmod p, (a \times b) \bmod p$ 的时间复杂度都为 $O(1)$。）
+
+我们将整数 $n$ 用二进制表示
+$$
+n = (n_m,n_{m-1},...,n_1,n_0)_b, m = \lfloor \log n \rfloor.
+$$
+那么
+$$
+n = n_m2^m + n_{m-1}2^{m-1} + \cdots + n_12^1 + n_02^0
+$$
+接着
+$$
+\begin{aligned}
+T_n &= 2^n - 1 \\
+&= 2^{n_m2^m + n_{m-1}2^{m-1} + \cdots + n_12^1 + n_02^0} - 1 \\
+&= 2^{n_m2^m} \times 2^{n_{m-1}2^{m-1}} \times \cdots \times 2^{n_12^1} \times 2^{n_02^0} - 1.
+\end{aligned}
+$$
+因此
+$$
+\begin{aligned}
+T_n \bmod p &= (2^n - 1) \bmod p \\
+&= (2^{n_m2^m} \times 2^{n_{m-1}2^{m-1}} \times \cdots \times 2^{n_12^1} \times 2^{n_02^0} - 1) \bmod p \\
+&= (\prod_{i=0}^{m} (2^{n_i2^i} \bmod p) \bmod p - 1 \bmod p) \bmod p ,
+\end{aligned}
+$$
+时间复杂度为 $O(m)=O(\log{n})$。
