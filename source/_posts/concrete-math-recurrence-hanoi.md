@@ -96,11 +96,11 @@ r = -1.
 $$
 非齐次递归关系的解，为齐次递归关系下的通解与非齐次递归关系下的特解相加，即
 $$
-Tn = c2^n - 1.
+T_n = c2^n - 1.
 $$
 将初值 $T_0 = 0$ 带入上式，得到 $c=1$， 则该非齐次递归关系的解为
 $$
-Tn = 2^n - 1.
+T_n = 2^n - 1.
 $$
 
 ### 生成函数求解
@@ -115,7 +115,7 @@ $$
 g(x) - 2xg(x) &= T_0 + (T_1-2T_0)x + (T_2-2T_1)x^2 + \cdots + (T_n-2T_{n-1})x^n + \cdots \\
 &= 0 + 1x + 1^2x^2 + \cdots + 1^nx^n + \cdots \\
 &= -1 + (1 + x + x^2 + \cdots + x^n + \cdots) \\
-&= -1 + \frac{1}{1-x}
+&= -1 + \frac{1}{1-x}.
 \end{align*}
 $$
 因此
@@ -124,12 +124,12 @@ $$
 g(x) &= \frac{1}{(1-x)(1-2x)} - \frac{1}{1-2x} \\
 &= \frac{1}{1-2x} - \frac{1}{1-x} \\
 &= \sum_{n=0}^{\infty}2^nx^n - \sum_{n=0}^{\infty}1^nx^n \\
-&= \sum_{n=0}^{\infty}(2^n-1)x^n
+&= \sum_{n=0}^{\infty}(2^n-1)x^n.
 \end{align*}
 $$
 我们得到递推关系的解为
 $$
-T_n = 2^n - 1
+T_n = 2^n - 1.
 $$
 
 ### 直接展开
@@ -156,7 +156,7 @@ n = (n_m,n_{m-1},...,n_1,n_0)_b, m = \lfloor \log n \rfloor.
 $$
 那么
 $$
-n = n_m2^m + n_{m-1}2^{m-1} + \cdots + n_12^1 + n_02^0
+n = n_m2^m + n_{m-1}2^{m-1} + \cdots + n_12^1 + n_02^0.
 $$
 接着
 $$
@@ -171,7 +171,7 @@ $$
 \begin{aligned}
 T_n \bmod p &= (2^n - 1) \bmod p \\
 &= (2^{n_m2^m} \times 2^{n_{m-1}2^{m-1}} \times \cdots \times 2^{n_12^1} \times 2^{n_02^0} - 1) \bmod p \\
-&= (\prod_{i=0}^{m} (2^{n_i2^i} \bmod p) \bmod p - 1 \bmod p) \bmod p ,
+&= (\prod_{i=0}^{m} (2^{n_i2^i} \bmod p) \bmod p - 1 \bmod p) \bmod p .
 \end{aligned}
 $$
 时间复杂度为 $O(m)=O(\log{n})$。
