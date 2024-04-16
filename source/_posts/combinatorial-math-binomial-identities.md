@@ -71,6 +71,10 @@ $$
 $$
 \begin{pmatrix} r \\ k \end{pmatrix} = (-1)^k \begin{pmatrix} k-r-1 \\ k \end{pmatrix}, k \in Z.
 $$
+**平行求和**
+$$
+\sum_{k \leq n} \begin{pmatrix} r+k \\ k \end{pmatrix} = \begin{pmatrix} r+n+1 \\ k \end{pmatrix}, n \in Z.
+$$
 **二项式定理**
 $$
 (x+y)^r = \sum_k \begin{pmatrix} r \\ k \end{pmatrix} x^k y^{r-k}.
