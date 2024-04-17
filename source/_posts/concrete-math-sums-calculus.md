@@ -104,7 +104,7 @@ $$
 **例 3**：计算 $\sum_{k=1}^n\frac{2k+1}{k(k+1)}$
 $$
 \begin{align*}
-\sum_{k=1}^n\frac{2k+1}{k(k+1)} &= \left. -\frac{2k+1}{k} \right|_1^{n+1} + \sum_{k=1}^n \frac{2}{x+1} \\
+\sum_{k=1}^n\frac{2k+1}{k(k+1)} &= \left. -\frac{2k+1}{k} \right|_1^{n+1} + \sum_{k=1}^n \frac{2}{k+1} \\
 &= -\frac{2(n+1)+1}{n+1} + 2H_{n+1} \\
 &= H_{n+1} + H_n + 1.
 \end{align*}
