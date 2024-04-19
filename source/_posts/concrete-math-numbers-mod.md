@@ -20,7 +20,7 @@ $$
 
 - 封闭性：加法和乘法都具有封闭性，有限个元素的运算其结果也是有限个元素。
 - 零元与单位元：加法具有零元，即 $\forall \bar{a} + \bar{0} = \bar{a}; \forall \bar{0} + \bar{a} = \bar{a}$；乘法<u>可能</u>具有单位元，即 $\forall \bar{a} \cdot \bar{e} = \bar{a}; \forall \bar{e} \cdot \bar{a} = \bar{a}$。
-- 逆元：加法具有可逆性，即 $\forall \bar{a}, \exist b \ s.t. \bar{a} + \bar{b} = \bar{0}$；乘法<u>可能</u>具有可逆性，即 $ \forall \bar{a}, \exist b \ s.t. \bar{a} \cdot \bar{b} = \bar{e}$。 
+- 逆元：加法具有可逆性，即 $\forall \bar{a}, \exist b \ \mathrm{s.t.} \ \bar{a} + \bar{b} = \bar{0}$；乘法<u>可能</u>具有可逆性，即 $ \forall \bar{a}, \exist b \ \mathrm{s.t.} \ \bar{a} \cdot \bar{b} = \bar{e}$。 
 - 结合律：加法和乘法都符合结合律。
 - 交换律：加法符合交换律，乘法<u>可能</u>符合交换律。
 - 分配律：加法和乘法都符合分配律。
