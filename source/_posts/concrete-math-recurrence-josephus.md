@@ -87,16 +87,16 @@ $$
 假设 $n$ 的二进制表示为 $n=(b_mb_{m-1}\dotsb_1b_0)_b,m = \lfloor \log n \rfloor$，其中 $b_m=1$。注意到 $n=2^m+l$，有
 $$
 \begin{align*}
-n &= (1b_{m-1}\dotsb_1b_0)_b, \\
-l &= (0b_{m-1}\dotsb_1b_0)_b, \\
-2l &= (b_{m-1}\dotsb_1b_00)_b, \\
-2l+1 &= (b_{m-1}\dotsb_1b_01)_b, \\
-J_n &= (b_{m-1}\dotsb_1b_0b_m)_b.
+n &= (1b_{m-1} \dots b_1b_0)_b, \\
+l &= (0b_{m-1} \dots b_1b_0)_b, \\
+2l &= (b_{m-1} \dots b_1b_00)_b, \\
+2l+1 &= (b_{m-1} \dots b_1b_01)_b, \\
+J_n &= (b_{m-1} \dots b_1b_0b_m)_b.
 \end{align*}
 $$
 这里我们得到了
 $$
-J_{(b_mb_{m-1}\dotsb_1b_0)_b} = (b_{m-1}\dotsb_1b_0b_m)_b.
+J_{(b_mb_{m-1} \dots b_1b_0)_b} = (b_{m-1} \dots b_1b_0b_m)_b.
 $$
 即我们将 $n$ 向左循环移动一位就可以得到 $J_n$。
 
