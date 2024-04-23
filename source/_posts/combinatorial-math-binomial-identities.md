@@ -6,10 +6,10 @@ tags:
 
 # 基本二项恒等式 Basic Binomial Identities
 
-在组合意义中，$\begin{pmatrix} r \\ k \end{pmatrix}$ 代表从具有 $n$ 个元素的集合中选取 $k$ 个元素作为子集的方法数，其计算公式为
+在组合意义中，$\begin{pmatrix} n \\ k \end{pmatrix}$ 代表从具有 $r$ 个元素的集合中选取 $k$ 个元素作为子集的方法数，其计算公式为
 $$
 \begin{pmatrix} r \\ k \end{pmatrix} = \begin{align*} \left\{ \begin{matrix}
-\frac{r(r-1)\cdots (r-k+1)}{k(k-1)\cdots (1)} = \frac{n!}{k!(n-k)!} = \frac{r^{\underline{k}}}{k!}, &k \geq 0, k \in Z, \\
+\frac{r(r-1)\cdots (r-k+1)}{k(k-1)\cdots (1)} = \frac{r!}{k!(r-k)!} = \frac{r^{\underline{k}}}{k!}, &k \geq 0, k \in Z, \\
 0, &k < 0, k \in Z.
 \end{matrix} \right. \end{align*}
 $$
