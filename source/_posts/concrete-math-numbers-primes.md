@@ -17,7 +17,7 @@ tags:
 
 任何正整数 $n$ 都可以表示为素数的乘积，且其构成非减素数乘积序列是唯一的，即
 $$
-n = \prod_p p^{n_p}, \vee n_p \geq 0.
+n = \prod_p p^{n_p}, \forall n_p \geq 0.
 $$
 **欧几里得数**
 
