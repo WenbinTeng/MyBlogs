@@ -35,30 +35,6 @@ $$
 \begin{pmatrix} r-1 \\ k-1 \end{pmatrix},
 k \in Z.
 $$
-$\begin{pmatrix} r \\ k \end{pmatrix}$ 是从一个有 $r$ 个元素的集合中选取可能的 $k$ 个元素的子集的个数。如果我们有 $r$ 个鸡蛋组成的集合，它恰好包含一个坏的鸡蛋，那么就有 $\begin{pmatrix} r \\ k \end{pmatrix}$ 种方式选取 $k$ 个鸡蛋。这些选取方法中恰好有 $\begin{pmatrix} r-1 \\ k \end{pmatrix}$ 种只选好的鸡蛋，而其中 $\begin{pmatrix} r-1 \\ k-1 \end{pmatrix}$ 种选取方法则都含有那个坏的鸡蛋，因为这样的选法 是从 $r-1$ 个好鸡蛋中选取 $k-1$ 个。把这两个数加在一起就得出上式。
-
-或者，我们可以将吸收恒等式与相伴恒等式相加得到上式 $r\neq0$ 的情形，即
-$$
-(r-k)\begin{pmatrix} r \\ k \end{pmatrix} +
-k\begin{pmatrix} r \\ k \end{pmatrix} =
-r\begin{pmatrix} r \\ k \end{pmatrix} =
-r \begin{pmatrix} r-1 \\ k \end{pmatrix} +
-r \begin{pmatrix} r-1 \\ k-1 \end{pmatrix}.
-$$
-而 $r=0$ 的情形也容易处理。
-
-再或者，我们直接根据组合数定义展开得到 $k>0$ 的情形，即
-$$
-\begin{align*}
-r \begin{pmatrix} r-1 \\ k \end{pmatrix} +
-r \begin{pmatrix} r-1 \\ k-1 \end{pmatrix} &=
-\frac{(r-1)^{\underline{k}}}{k!} + \frac{(r-1)^{\underline{k-1}}}{(k-1)!} \\
-&= \frac{(r-1)^{\underline{k-1}}(r-k)}{k!} + \frac{(r-1)^{\underline{k-1}}k}{k!} \\
-&= \frac{(r-1)^{\underline{k-1}}r}{k!} = \frac{r^{\underline{k}}}{k!} = \begin{pmatrix} r \\ k \end{pmatrix}.
-\end{align*}
-$$
-而 $k\leq0$ 的情形也容易处理。
-
 **上指标求和**
 $$
 \sum_{0 \leq k \leq n} \begin{pmatrix} k \\ m \end{pmatrix} = 
