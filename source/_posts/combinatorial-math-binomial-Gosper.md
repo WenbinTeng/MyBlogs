@@ -1,5 +1,5 @@
 ---
-title: concrete-math-binomial-Gosper
+title: combinatorial-math-binomial-Gosper
 date: 2024-05-05 16:46:52
 tags:
 ---
