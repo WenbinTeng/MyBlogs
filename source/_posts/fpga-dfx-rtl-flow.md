@@ -11,7 +11,7 @@ typora-root-url: fpga-dfx-rtl-flow
 
 **1. 准备设计文件**
 
-下载 Xilinx 提供的[参考设计文件](https://www.xilinx.com/member/forms/download/design-license.html?cid=03e48cb4-ba89-496d-a3d7-cbaa2302ef79&filename=ug947-vivado-partial-reconfiguration-tutorial.zip)，解压后进入 `\dfx_project` 文件夹，假设路径为`<Extract_Dir>`。
+下载 Xilinx 提供的[参考设计文件](https://www.xilinx.com/member/forms/download/design-license.html?cid=03e48cb4-ba89-496d-a3d7-cbaa2302ef79&filename=ug947-vivado-partial-reconfiguration-tutorial.zip)，解压后进入 `\dfx_project` 文件夹，假设路径为 `<Extract_Dir>`。
 
 **2. 加载工程和设计文件**
 
