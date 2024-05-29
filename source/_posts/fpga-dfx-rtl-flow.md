@@ -5,7 +5,7 @@ tags:
 typora-root-url: fpga-dfx-rtl-flow
 ---
 
-# FPGA DFX RTL FLOW
+# FPGA DFX RTL Flow
 
 在本次实验中，我们将创建一个基于 RTL 设计的 DFX 工程。实验的顶层模块将使用两个可重构模块来输出 LED 图案，用以说明分区定义的细节。
 
