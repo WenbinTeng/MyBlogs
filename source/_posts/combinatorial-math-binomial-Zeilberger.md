@@ -10,7 +10,7 @@ Zeilberger 算法推广了 Gosper 算法，可以机械化地处理所有对 $k$
 
 0. 置 $l:=0$。
 
-1. 令 $\hat{t} = \beta_0(n) t(n,k) + \cdots + \beta_l(n) t(n,k)$，其中 $\beta_0(n),\dots,\beta_l(n)$ 都是未知的函数。利用 $t(n,k)$ 的性质寻求 $\beta_0(n),\dots,\beta_l(n)$ 的线性组合 $p(n,k)$，其系数是关于 $n$ 和 $k$ 的多项式，使得 $\hat{t}(n,k)$ 可以写成形式 $p(n,k)\bar{t}(n,k)$，其中 $\bar{t}(n,k)$ 就是关于 $k$ 的超几何项。求多项式 $\bar{p}(n,k),q(n,k),r(n,k)$  使得 $\bar{t}(n,k)$ 的项的比值形如 $\frac{\bar{t}(n,k+1)}{\bar{t}(n,k)} = \frac{\bar{p}(n,k+1)}{\bar{p}(n,k)} \frac{q(n,k)}{r(n,k+1)}$，其中 $q(n,k),r(n,k)$ 满足 Gosper 条件。置 $\hat{p}(n,k)=p(n,k)\bar{p}(n,k)$。
+1. 令 $\hat{t} = \beta_0(n) t(n,k) + \cdots + \beta_l(n) t(n+l,k)$，其中 $\beta_0(n),\dots,\beta_l(n)$ 都是未知的函数。利用 $t(n,k)$ 的性质寻求 $\beta_0(n),\dots,\beta_l(n)$ 的线性组合 $p(n,k)$，其系数是关于 $n$ 和 $k$ 的多项式，使得 $\hat{t}(n,k)$ 可以写成形式 $p(n,k)\bar{t}(n,k)$，其中 $\bar{t}(n,k)$ 就是关于 $k$ 的超几何项。求多项式 $\bar{p}(n,k),q(n,k),r(n,k)$  使得 $\bar{t}(n,k)$ 的项的比值形如 $\frac{\bar{t}(n,k+1)}{\bar{t}(n,k)} = \frac{\bar{p}(n,k+1)}{\bar{p}(n,k)} \frac{q(n,k)}{r(n,k+1)}$，其中 $q(n,k),r(n,k)$ 满足 Gosper 条件。置 $\hat{p}(n,k)=p(n,k)\bar{p}(n,k)$。
 2. 置 $\mathrm{deg}(Q)=\mathrm{deg}(q-r), \mathrm{deg}(R)=\mathrm{deg}(q+r)$，以及 $d:=\left\{\begin{array}{l} \mathrm{deg}(\hat{p})-\mathrm{deg}(Q), \quad \mathrm{deg}(Q) \geq \mathrm{deg}(R) \\
    \mathrm{deg}(\hat{p})-\mathrm{deg}(R)+1, \quad \mathrm{deg}(Q) < \mathrm{deg}(R)
    \end{array}\right.$。如果 $d \geq 0$，定义 $s(k)=\alpha_{d}k^{d} + \alpha_{d-1}k^{d-1} + \cdots + \alpha_0, \alpha_d \neq 0$，在方程 $\hat{p}(n,k) = q(n,k)s(n,k+1)-r(n,k)s(n,k)$ 中令 $k$ 的幂次相等，可以得到关于 $\alpha_0,\dots,\alpha_d,\beta_0,\dots,\beta_l$ 的线性方程组。如果这些方程有一个使得 $\beta_0,\dots,\beta_l$ 不全为零的解，则跳转到第 4 步。如若不然，当 $\mathrm{deg}(Q) < \mathrm{deg}(R)$ 且 $\frac{-2\lambda'}{\lambda}$ 是一个大于 $d$ 的整数时（其中 $\lambda$ 是 $q+r$ 中 $k^{\mathrm{deg}(R)-1}$ 的系数，而 $\lambda’$ 是 $q-r$ 中 $k^{\mathrm{deg}(R)-1}$ 的系数），就置 $d:=\frac{-2\lambda'}{\lambda}$ 并重复上述步骤。
@@ -73,5 +73,5 @@ $$
 $$
 如果 $\bar{p}(n,k) = 1$，那么 $q(n,k) = (n-2k)(n-2k+1), r(n,k) = 2k(2k-1) \Rightarrow d = \mathrm{deg}(\hat{p}) - \mathrm{deg}(R) + 1 = 0$，设 $s(n,k) = s$，有 $\beta_0(n) = 2ns, \beta_1(n) = -ns$，因此
 $$
-2ns \hat t(n,k) - ns \hat t(n+1,k) = 0 \Rightarrow 2nS_n = nS_{n+1}.
+2ns \hat{t(n,k)} - ns \hat{t(n+1,k)} = 0 \Rightarrow 2S_n = S_{n+1}.
 $$
