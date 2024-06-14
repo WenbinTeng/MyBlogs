@@ -14,7 +14,7 @@ $$
 $$
 其中 $p,q,r$ 是满足以下条件的多项式
 $$
-(k+\alpha) | q(k) \and (k+\beta) | r(k) \Rightarrow \alpha - \beta \notin Z.
+(k+\alpha) | q(k) \and (k+\beta) | r(k) \Rightarrow \alpha - \beta \notin Z_+.
 $$
 可以暂时从 $p(k)=1$ 出发，并令 $q(k)$ 和 $r(k)$ 是将它们分解成线性因子后，项的比值的分子和分母。如果 $q$ 和 $r$ 有因子 $(k+\alpha)$ 和 $(k+\beta)$，其中 $\alpha-\beta=N>0$，则将其从 $q$ 和 $r$ 中去除，并用 $p(k)(k+\alpha-1)^{\underline{N-1}}$ 代替 $p(k)$。重复这个过程直至上式成立。
 
@@ -45,7 +45,7 @@ $$
 $$
 \frac{t(k+1)}{t(k)} = \frac{k-n}{k+1} = \frac{p(k+1)}{p(k)}\frac{q(k)}{r(k+1)}.
 $$
-这里我们直接取 $p(k)=1,q(k)=k-n,r(k)=1$，这种选取要求满足条件。
+这里我们直接取 $p(k)=1,q(k)=k-n,r(k)=k$，这种选取要求满足条件。
 
 现在考虑 $Q(k)=-n,R(k)=2k-n$，由于 $\mathrm{deg}(Q) < \mathrm{deg}(R)$，要么 $d = \mathrm{deg}(p) - \mathrm{deg}(R) + 1 = 0$，要么 $d=\frac{-2\lambda'}{\lambda} = n$，我们先考虑前者。假设 $d = 0$，则 $s(k)=\alpha_0$，代入 $p(k)$ 的表达式有
 $$
