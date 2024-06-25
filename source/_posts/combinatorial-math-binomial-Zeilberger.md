@@ -73,5 +73,5 @@ $$
 $$
 如果 $\bar{p}(n,k) = 1$，那么 $q(n,k) = (n-2k)(n-2k+1), r(n,k) = 2k(2k-1) \Rightarrow d = \mathrm{deg}(\hat{p}) - \mathrm{deg}(R) + 1 = 0$，设 $s(n,k) = s$，有 $\beta_0(n) = 2ns, \beta_1(n) = -ns$，因此
 $$
-2ns \hat{t(n,k)} - ns \hat{t(n+1,k)} = 0 \Rightarrow 2S_n = S_{n+1}.
+2ns \hat{t}(n,k) - ns \hat{t}(n+1,k) = 0 \Rightarrow 2S_n = S_{n+1}.
 $$
