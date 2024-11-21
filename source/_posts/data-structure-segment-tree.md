@@ -118,7 +118,7 @@ void update(int node, int start, int end, int index, int newValue) {
 
 ### 3. 线段树的复杂度分析
 
-- 时间复杂度：对于 $n$ 个元素的数组，其构造的线段树的节点个数不超过 $n+\frac{n}{2}+\frac{n}{4}+\cdots = 2n$ 个，因此构造线段树的时间复杂度为 $O(n)$；区间查询的时间复杂度为 $O(\log{n})$，单点修改的时间复杂度为 $O(\log{n})$。
+- 时间复杂度：对于 $n$ 个元素的数组，二叉树的高度不超过 $\lceil \log{n} \rceil + 1$，那么树的节点数量不超过 $ 2^{\lceil \log{n} \rceil + 1} - 1 \leq 4n $，因此构造线段树的时间复杂度为 $O(n)$；区间查询的时间复杂度为 $O(\log{n})$，单点修改的时间复杂度为 $O(\log{n})$。
 - 空间复杂度：$O(n)$。
 
 
@@ -129,8 +129,10 @@ void update(int node, int start, int end, int index, int newValue) {
 class SegmentTree {
 public:
     void init(int node, std::vector<int>& a, int start, int end) {
-        if (node == 1)
-            tree = std::vector<int>(a.size() * 2 + 1);
+        if (node == 1) {
+            n = a.size();
+            tree = std::vector<int>(n * 2 + 1);
+        }
         if (start == end) {
             tree[node] = a[start];
             return;
@@ -182,6 +184,7 @@ public:
     }
     
 private:
+    int n;
     std::vector<int> tree;
 }
 ```
