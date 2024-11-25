@@ -39,10 +39,18 @@ tags:
 
 - **Case 1：插入的父节点是黑色**
   树仍满足红黑树规则，无需调整。
+  
+  <img src="./data-structure-red-black-tree/case1.png" alt="case1" style="width:25%;" />
+
 - **Case 2：插入的父节点是红色，且叔叔节点也是红色**
   重新着色，将父节点和叔叔节点变为黑色，祖父节点变为红色；如果祖父节点是根节点，则变为黑色。递归进行重新着色的过程，传递到根节点，整棵树变为标准的红黑树。
+
+  <img src="./data-structure-red-black-tree/case2.png" alt="case1" style="width:100%;" />
+
 - **Case 3：插入的父节点是红色，且叔叔节点是黑色**
   根据插入位置分为 LL 型、LR 型、RL 型、RR 型，通过旋转操作恢复平衡。在最后一次旋转之前交换旋转轴两侧节点的颜色，以满足红黑树的颜色要求。
+
+  <img src="./data-structure-red-black-tree/case3.png" alt="case1" style="width:100%;" />
 
 **2.2 查询操作**
 
