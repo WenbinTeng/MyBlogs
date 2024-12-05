@@ -32,73 +32,15 @@ K 近邻算法是一种基于实例学习的方法，用于分类或回归问题
 
 
 
-### 2. NN-Descent 算法
+### 2. FPGA 加速 KNN 算法
 
-NN-Descent 是一种用于构建 K 近邻图的高效算法，旨在解决 K 近邻图构建中的效率和扩展性问题。NN-Descent 的核心思想是**邻居的邻居更可能是邻居**。通过不断探索每个点邻居的邻居，可以逐步完善每个点的 K 近邻，从而构建一个高质量的 K 近邻图。如果使用暴力方法构建 K 近邻图的时间复杂度为 $O(n^2)$，而使用 NN-Descent 算法优化的时间复杂度可以达到 $O(n^{1.14})$。
+下面我们对 rosetta 基准测试 [1] 进行修改，在 FPGA 上使用 KNN 算法执行数字识别任务。
 
-算法的基本步骤如下：
+**2.1 计算距离**
 
-1. **初始化**：随机为每个点选择 K 个邻居，构建初始的近似 K 近邻图。
-2. **迭代优化**：对于每个点 v，计算其邻居的邻居集合 B[v]。 在 B[v] 中寻找新的 K 近邻，并更新 v 的 K 近邻列表。 重复上述过程，直到 K 近邻图不再更新。
-
-```python
-def nn_descent(data, k, max_iter=10):
-    # 初始化K近邻图
-    knn_graph = initialize_knn_graph(data, k)
-
-    for _ in range(max_iter):
-    	updated = False
-
-        for v in data:
-            # 计算邻居的邻居集合
-            neighbors = get_neighbors(knn_graph, v)
-            candidate_neighbors = set()
-            for neighbor in neighbors:
-                candidate_neighbors.update(get_neighbors(knn_graph, neighbor))
-
-            # 更新K近邻列表
-            new_neighbors = find_k_nearest_neighbors(data, v, candidate_neighbors, k)
-            if update_knn_graph(knn_graph, v, new_neighbors):
-                updated = True
-
-        if not updated:
-            break
-
-    return knn_graph
-```
-
-为了进一步提高算法效率，还可以使用以下方法：
-
-- **局部连接**：通过局部连接操作，减少冗余计算。
-- **增量搜索**：通过布尔标记，减少重复比较。
-- **采样**：通过邻居取样和反向邻居取样，缓解局部连接的高成本和冗余计算。
-- **提前终止**：在每次迭代中统计更新次数，当更新次数小于阈值时终止。
-
-详细操作参考论文 [1]。
-
-
-
-### 3. FPGA 加速 KNN 算法
+这里使用汉明距离作为度量，在 FPGA 上对样本的每一个二进制位进行异或操作并累加即可实现距离计算。
 
 ```c++
-// dataset information
-#define NUM_TRAINING 18000
-#define CLASS_SIZE 1800
-#define NUM_TEST 2000
-#define DIGIT_WIDTH 4
-
-// typedefs
-typedef unsigned long long DigitType;
-typedef unsigned char      LabelType;
-
-#include "ap_int.h"
-// sdsoc wide vector type
-typedef ap_uint<256>  WholeDigitType;
-
-// parameters
-#define K_CONST 3
-#define PAR_FACTOR 40
-
 // popcount function
 int popcount(WholeDigitType x) {
     // most straightforward implementation
@@ -144,33 +86,57 @@ void update_knn(WholeDigitType test_inst,
 
     return;
 }
+```
 
-void read_training_data_block(WholeDigitType global_training_set[NUM_TRAINING],
-                              hls::stream<WholeDigitType> &training_data_stream,
-                              int start) {
-    for (int i = 0; i < NUM_TRAINING / PAR_FACTOR; i++) {
-        training_data_stream.write(global_training_set[start * NUM_TRAINING / PAR_FACTOR + i]);
+**2.2 更新邻居**
+
+对于较大的 K 值，建议使用比较树的形式更新邻居；而对于较小的 K 值，采用顺序比较的方式更便捷。
+
+```c++
+// Given the test instance and a (new) training instance, this
+// function maintains/updates an array of K minimum
+// distances per training set.
+void update_knn(WholeDigitType test_inst,
+                WholeDigitType train_inst,
+                int min_distances[K_CONST]) {
+#pragma HLS inline
+
+    // Compute the difference using XOR
+    WholeDigitType diff = test_inst ^ train_inst;
+
+    int dist = 0;
+
+    dist = popcount(diff);
+
+    int max_dist = 0;
+    int max_dist_id = K_CONST + 1;
+    int k = 0;
+
+    // Find the max distance
+    FIND_MAX_DIST:for (int k = 0; k < K_CONST; k++) {
+        if (min_distances[k] > max_dist) {
+            max_dist = min_distances[k];
+            max_dist_id = k;
+        }
     }
-}
 
-void read_test_data(WholeDigitType global_test_set[NUM_TEST],
-                    hls::stream<WholeDigitType> &test_data_stream) {
-    for (int i = 0; i < NUM_TEST; i++) {
-        test_data_stream.write(global_test_set[i]);
-    }
-}
+    // Replace the entry with the max distance
+    if (dist < max_dist)
+        min_distances[max_dist_id] = dist;
 
-void write_result(hls::stream<LabelType> &result_stream,
-                  LabelType global_results[NUM_TEST]) {
-    for (int i = 0; i < NUM_TEST; i++) {
-        global_results[i] = result_stream.read();
-    }
+    return;
 }
+```
 
-void knn_vote_single(int knn_set[K_CONST],
-                     int min_distance_list[K_CONST],
-                     int label_list[K_CONST],
-                     int label_in) {
+**2.3 投票**
+
+由于在 FPGA 上使用多个处理单元（PE）并行计算来加速，因此需要从多个 PE 选出的多个 K 邻居集合中选出最后的 K 个最近邻居。
+
+```c++
+void knn_vote_small(int knn_set[NUM_LANE * K_CONST],
+                    int min_distance_list[K_CONST],
+                    int label_list[K_CONST],
+                    int label_in) {
 #pragma HLS inline
 #pragma HLS array_partition variable = knn_set complete dim = 0
 // final K nearest neighbors
@@ -180,22 +146,24 @@ void knn_vote_single(int knn_set[K_CONST],
 
     int pos = 1000;
 
-    INSERTION_SORT_OUTER:for (int j = 0; j < K_CONST; j++) {
+    LANES:for (int i = 0; i < NUM_LANE; i++) {
+        INSERTION_SORT_OUTER:for (int j = 0; j < K_CONST; j++) {
 #pragma HLS pipeline
-        pos = 1000;
-        INSERTION_SORT_INNER:for (int r = 0; r < K_CONST; r++) {
+            pos = 1000;
+            INSERTION_SORT_INNER:for (int r = 0; r < K_CONST; r++) {
 #pragma HLS unroll
-            pos = ((knn_set[j] < min_distance_list[r]) && (pos > K_CONST)) ? r : pos;
-        }
+                pos = ((knn_set[i * K_CONST + j] < min_distance_list[r]) && (pos > K_CONST)) ? r : pos;
+            }
 
-        INSERT:for (int r = K_CONST; r > 0; r--) {
+            INSERT:for (int r = K_CONST; r > 0; r--) {
 #pragma HLS unroll
-            if (r - 1 > pos) {
-                min_distance_list[r - 1] = min_distance_list[r - 2];
-                label_list[r - 1] = label_list[r - 2];
-            } else if (r - 1 == pos) {
-                min_distance_list[r - 1] = knn_set[j];
-                label_list[r - 1] = label_in;
+                if (r - 1 > pos) {
+                    min_distance_list[r - 1] = min_distance_list[r - 2];
+                    label_list[r - 1] = label_list[r - 2];
+                } else if (r - 1 == pos) {
+                    min_distance_list[r - 1] = knn_set[i * K_CONST + j];
+                    label_list[r - 1] = label_in;
+                }
             }
         }
     }
@@ -220,13 +188,13 @@ void knn_vote_final(hls::stream<int> &knn_set_stream,
         INIT_1:for (int i = 0; i < K_CONST; i++) {
             label_list[i] = knn_set_stream.read();
         }
-        INIT:for (int i = 0; i < 10; i++) {
-    #pragma HLS unroll
+        INIT_2:for (int i = 0; i < 10; i++) {
+#pragma HLS unroll
             vote_list[i] = 0;
         }
 
         INCREMENT:for (int i = 0; i < K_CONST; i++) {
-    #pragma HLS pipeline
+#pragma HLS pipeline
             vote_list[label_list[i]] += 1;
         }
 
@@ -234,7 +202,7 @@ void knn_vote_final(hls::stream<int> &knn_set_stream,
         max_vote = 0;
 
         VOTE:for (int i = 0; i < 10; i++) {
-    #pragma HLS unroll
+#pragma HLS unroll
             if (vote_list[i] >= vote_list[max_vote]) {
                 max_vote = i;
             }
@@ -243,80 +211,62 @@ void knn_vote_final(hls::stream<int> &knn_set_stream,
         result_stream.write(max_vote);
     }
 }
-
-void inference(hls::stream<WholeDigitType> &training_data_stream,
-               hls::stream<WholeDigitType> &test_data_stream,
-               hls::stream<int> &knn_set_stream_in,
-               hls::stream<int> &knn_set_stream_out,
-               LabelType label_in) {
-
-    // This array stores K minimum distances per training set
-    int knn_set[K_CONST];
-    int min_distance_list[K_CONST];
-    int label_list[K_CONST];
-
-    TRAIN_LOOP:for (int i = 0; i < NUM_TRAINING; i++) {
-        WholeDigitType train_inst = training_data_stream.read();
-
-        for (int j = 0; j < K_CONST; j++) {
-#pragma HLS unroll
-            knn_set[j] = 256;
-        }
-        for (int j = 0; j < K_CONST; j++) {
-            min_distance_list[j] = knn_set_stream_in.read();
-        }
-        for (int j = 0; j < K_CONST; j++) {
-            label_list[j] = knn_set_stream_in.read();
-        }
-
-        TEST_LOOP:for (int j = 0; j < NUM_TEST; j++) {
-#pragma HLS pipeline
-            WholeDigitType test_inst = test_data_stream.read();
-            update_knn(test_inst, train_inst, knn_set);
-        }
-
-        knn_vote_single(knn_set, min_distance_list, label_list, label_in);
-
-        for (int j = 0; j < K_CONST; j++) {
-            knn_set_stream_out.write(min_distance_list[j]);
-        }
-        for (int j = 0; j < K_CONST; j++) {
-            knn_set_stream_out.write(label_list[j]);
-        }
-    }
-}
-
-// top-level hardware function
-void digit_rec(WholeDigitType global_training_set[NUM_TRAINING],
-               WholeDigitType global_test_set[NUM_TEST],
-               LabelType global_results[NUM_TEST]) {
-#pragma HLS dataflow
-
-    static hls::stream<WholeDigitType> training_stream_set[PAR_FACTOR];
-    static hls::stream<WholeDigitType> test_stream_set[PAR_FACTOR];
-    static hls::stream<int> knn_set_stream[PAR_FACTOR + 1];
-    static hls::stream<LabelType> result_stream;
-
-    for (int i = 0; i < K_CONST * 2; i++) {
-#pragma HLS unroll
-        knn_set_stream[0].write(0);
-    }
-
-    for (int p = 0; p < PAR_FACTOR; p++) {
-        read_training_data_block(global_training_set, training_stream_set[p], p);
-        read_test_data(global_test_set, test_stream_set[p]);
-    }
-    for (int p = 0; p < PAR_FACTOR; p++) {
-#pragma HLS unroll
-        inference(training_stream_set[p], test_stream_set[p], knn_set_stream[p], knn_set_stream[p + 1], p / (PAR_FACTOR / 10));
-    }
-    knn_vote_final(knn_set_stream[PAR_FACTOR], result_stream);
-    write_result(result_stream, global_results);
-}
 ```
+
+**2.4 并行计算设计**
+
+我们采用组内并行、组间流水的方式构建单个样本的 K 近邻，在流水线末端根据 K 近邻投票产生样本对应的标签。完整代码详见 [Github]([Terris/app/digit-recognition at main · WenbinTeng/Terris](https://github.com/WenbinTeng/Terris/tree/main/app/digit-recognition))。
+
+
+
+### 3. NN-Descent 算法
+
+NN-Descent 是一种用于构建 K 近邻图的高效算法，旨在解决 K 近邻图构建中的效率和扩展性问题。NN-Descent 的核心思想是**邻居的邻居更可能是邻居**。通过不断探索每个点邻居的邻居，可以逐步完善每个点的 K 近邻，从而构建一个高质量的 K 近邻图。如果使用暴力方法构建 K 近邻图的时间复杂度为 $O(n^2)$，而使用 NN-Descent 算法优化的时间复杂度可以达到 $O(n^{1.14})$。
+
+算法的基本步骤如下：
+
+1. **初始化**：随机为每个点选择 K 个邻居，构建初始的近似 K 近邻图。
+2. **迭代优化**：对于每个点 v，计算其邻居的邻居集合 B[v]。 在 B[v] 中寻找新的 K 近邻，并更新 v 的 K 近邻列表。 重复上述过程，直到 K 近邻图不再更新。
+
+```python
+def nn_descent(data, k, max_iter=10):
+    # 初始化K近邻图
+    knn_graph = initialize_knn_graph(data, k)
+
+    for _ in range(max_iter):
+    	updated = False
+
+        for v in data:
+            # 计算邻居的邻居集合
+            neighbors = get_neighbors(knn_graph, v)
+            candidate_neighbors = set()
+            for neighbor in neighbors:
+                candidate_neighbors.update(get_neighbors(knn_graph, neighbor))
+
+            # 更新K近邻列表
+            new_neighbors = find_k_nearest_neighbors(data, v, candidate_neighbors, k)
+            if update_knn_graph(knn_graph, v, new_neighbors):
+                updated = True
+
+        if not updated:
+            break
+
+    return knn_graph
+```
+
+为了进一步提高算法效率，还可以使用以下方法：
+
+- **局部连接**：通过局部连接操作，减少冗余计算。
+- **增量搜索**：通过布尔标记，减少重复比较。
+- **采样**：通过邻居取样和反向邻居取样，缓解局部连接的高成本和冗余计算。
+- **提前终止**：在每次迭代中统计更新次数，当更新次数小于阈值时终止。
+
+详细操作参考论文 [2]。
 
 
 
 ### 4. 参考文献
 
-[1] Dong, Wei, Charikar Moses, and Kai Li. "Efficient k-nearest neighbor graph construction for generic similarity measures." *Proceedings of the 20th international conference on World wide web*. 2011.
+[1] Zhou Y, Gupta U, Dai S, et al. Rosetta: A realistic high-level synthesis benchmark suite for software programmable FPGAs[C]//Proceedings of the 2018 ACM/SIGDA International Symposium on Field-Programmable Gate Arrays. 2018: 269-278.
+
+[2] Dong W, Moses C, Li K. Efficient k-nearest neighbor graph construction for generic similarity measures[C]//Proceedings of the 20th international conference on World wide web. 2011: 577-586.
