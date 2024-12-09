@@ -88,14 +88,14 @@ int query(int index) {
 ```c++
 class BinaryIndexedTree {
 public:
-    FenwickTree(int n) {
+    BinaryIndexedTree(int n) {
         tree.resize(n + 1, 0);
     }
 
     void update(int index, int delta) {
         while (index <= tree.size()) {
             tree[index] += delta;
-            idx += lowbit(index);
+            index += lowbit(index);
         }
     }
 
