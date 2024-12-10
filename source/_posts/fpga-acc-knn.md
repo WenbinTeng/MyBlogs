@@ -217,6 +217,19 @@ void knn_vote_final(hls::stream<int> &knn_set_stream,
 
 我们采用组内并行、组间流水的方式构建单个样本的 K 近邻，在流水线末端根据 K 近邻投票产生样本对应的标签。完整代码详见 [Github]([Terris/app/digit-recognition at main · WenbinTeng/Terris](https://github.com/WenbinTeng/Terris/tree/main/app/digit-recognition))。
 
+```
+             PE   #0                 PE   #1
+            ----------              ---------- 
+test_data  | lane #0  | test_data  | lane #0  |
+---------> | lane #1  | ---------> | lane #1  | --> ...
+           | ...      |       knn  | ...      |              ------
+           | lane #m  | ---------> | lane #m  | --> ... --> | vote | --> label
+            ----------              ----------               ------
+                 ^                       ^
+train_data       |                       |
+-----------------+-----------------------+--------> ...
+```
+
 
 
 ### 3. NN-Descent 算法
