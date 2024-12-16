@@ -215,7 +215,7 @@ void knn_vote_final(hls::stream<int> &knn_set_stream,
 
 **2.4 并行计算设计**
 
-我们采用组内并行、组间流水的方式构建单个样本的 K 近邻，在流水线末端根据 K 近邻投票产生样本对应的标签。完整代码详见 [Github]([Terris/app/digit-recognition at main · WenbinTeng/Terris](https://github.com/WenbinTeng/Terris/tree/main/app/digit-recognition))。
+我们采用组内并行、组间流水的方式构建单个样本的 K 近邻，在流水线末端根据 K 近邻投票产生样本对应的标签。完整代码详见 [Github](https://github.com/WenbinTeng/Terris/tree/main/app/digit-recognition)。
 
 ```
              PE   #0                 PE   #1
