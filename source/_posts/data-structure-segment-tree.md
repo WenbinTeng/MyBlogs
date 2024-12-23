@@ -186,7 +186,7 @@ public:
 private:
     int n;
     std::vector<int> tree;
-}
+};
 ```
 
 
