@@ -93,7 +93,7 @@ public:
     }
 
     void update(int index, int delta) {
-        while (index <= tree.size()) {
+        while (index < tree.size()) {
             tree[index] += delta;
             index += lowbit(index);
         }
