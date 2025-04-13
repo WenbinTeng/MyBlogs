@@ -79,5 +79,71 @@ std::vector<int> cantorDecode(int k, int n) {
 
 ### 3. 处理重复元素
 
-如果某个元素有重复，我们需要除以它们重复出现次数的阶乘。这是因为重复元素的排列方式并不会产生新的独特排列。在计算每个元素排名时，使用它们出现的次数来调整其排名。例如，如果一个元素已经出现过，那么它的“排名”会受到前面已经出现过相同元素的影响。我们可以通过统计每个元素的剩余数量来正确计算它的位置。
+如果某个元素有重复，我们需要除以它们重复出现次数的阶乘，这是因为重复元素的排列方式并不会产生新的独特排列。在计算每个元素排名时，使用它们出现的次数来调整其排名。例如，如果一个元素已经出现过，那么它的“排名”会受到前面已经出现过相同元素的影响。我们可以通过统计每个元素的剩余数量来正确计算它的位置。
 
+##### 3.1 编码
+
+```C++
+int cantorEncode(std::vector<int>& perm) {
+    int n = perm.size();
+    int res = 0;
+    std::vector<bool> used(n, false);
+    
+    std::map<int, int> freq;
+    for (auto x : perm)
+        freq[x]++;
+    
+    for (int i = 0; i < n; i++) {
+        int count = 0;
+        for (auto& [x, c] : freq) {
+            if (x < perm[i])
+                count += c;
+		}
+        res += count * std::tgamma(n - i);
+        freq[perm[i]]--;
+        if (freq[perm[i]] == 0)
+            freq.erase(perm[i]);
+    }
+    
+    return res;
+}
+```
+
+##### 3.2 解码
+
+```c++
+std::vector<int> cantorDecode(int k, std::vector<int>& perm) {
+    int n = perm.size();
+    std::map<int, int> freq;
+    for (auto x : perm)
+        freq[x]++;
+    
+    std::vector<int> res;
+    
+    for (int i = 0; i < n; i++) {
+        int factorial = tgamma(i);
+        int index = k / factorial;
+        code %= factorial;
+        int count = -1;
+        for (auto& [x, c] : freq) {
+        	if (count == index) {
+                res.push_back(x);
+                freq[x]--;
+                if (freq[x] == 0)
+                    freq.erase(x);
+            	break;
+            }
+            count += c;
+		}
+    }
+    
+    return res;
+}
+```
+
+
+
+### 4. 注意
+
+- 请注意 `int` 类型的大小能否存储全排列编码和阶乘；
+- 使用迭代或查表代替 `gamma` 函数计算阶乘能降低时间复杂度。
