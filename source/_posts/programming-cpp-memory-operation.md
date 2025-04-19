@@ -4,7 +4,7 @@ date: 2025-04-18 22:53:42
 tags:
 ---
 
-# C++ 中的 new 和 delete 操作 The new and delete operations in C++
+# C++ 中的 new 和 delete 操作 The new and delete Operations in C++
 
 在 C++ 中，`new` 是我们最常用的内存分配方式之一。很多初学者会以为 `new` 只是一个语法糖，用来代替 C 语言的 `malloc`，但实际上，`new` 背后涉及的是一整套机制，其中包括 `operator new`、`placement new` 等概念。
 
