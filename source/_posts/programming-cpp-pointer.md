@@ -6,7 +6,7 @@ tags:
 
 # C++ 智能指针与引用 C++ Smart Pointer and Reference
 
- 在 C 语言编程中，使用裸指针（raw pointer）几乎是处理动态内存的唯一方式。然而，随着 C++ 的不断演进，特别是在 C++11 及之后的标准中，智能指针（`std::unique_ptr`, `std::shared_ptr`, `std::weak_ptr`）和引用（`&`）成为了更安全、更现代的替代品。
+在 C 语言编程中，使用裸指针（raw pointer）几乎是处理动态内存的唯一方式。然而，随着 C++ 的不断演进，特别是在 C++11 及之后的标准中，智能指针（`std::unique_ptr`, `std::shared_ptr`, `std::weak_ptr`）和引用（`&`）成为了更安全、更现代的替代品。
 
 
 
