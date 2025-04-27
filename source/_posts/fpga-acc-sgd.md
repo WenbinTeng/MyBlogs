@@ -114,11 +114,11 @@ void compute_stage2(hls::stream<FeatureType> &theta_stream,
 由于每次 $i$ 的迭代都依赖于前一次参数 $\theta_t$ 的更新值，因此对 $i$ 的迭代只能构建“读-算-写”粗粒度流水线。点积的计算可以用多个乘加单元并行计算，但其并行度的瓶颈还是在于内存的读写带宽。梯度计算和参数更新也可以分块进行，最好与第一阶段的乘加单元的分块一致，令流水线充分流动。完整代码详见 [Github](https://github.com/WenbinTeng/Terris/tree/main/app/spam-filter)。
 
 ```
-theta,x                                          theta_new
+theta,x                                           theta_new
 -------> VE #0 -- \                 / --> grad #0 --------->
-theta,x                                          theta_new
+theta,x                                           theta_new
 -------> VE #1 -- -> dot -> Sigmoid -- -> grad #1 --------->
-theta,x                                          theta_new
+theta,x                                           theta_new
 -------> VE #2 -- /                 \ --> grad #2 --------->
 ...
 ```
