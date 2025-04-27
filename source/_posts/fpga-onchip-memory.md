@@ -220,7 +220,7 @@ Xilinx 的 7 系 FPGA 一般支持以下几种 DRAM：
 
 <img src="6.png" style="zoom: 100%;" />
 
-在源代码窗口的“IP Sources”选项中可以看到我们创建的IP核文件，其中我们可以看到 Verilog 版本的实例化代码模板，如图所示。
+在源代码窗口的“IP Sources”选项中可以看到我们创建的 IP 核文件，其中我们可以看到 Verilog 版本的实例化代码模板，如图所示。
 
 <img src="7.png" style="zoom: 100%;" />
 
