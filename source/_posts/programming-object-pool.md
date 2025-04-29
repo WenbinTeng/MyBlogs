@@ -63,11 +63,11 @@ private:
     size_t _counter;
     
     T* get(size_t index) {
-       	reinterpret_cast<T*>(static_cast<char*>(raw_) + index * sizeof(T));
+       	reinterpret_cast<T*>(static_cast<char*>(_raw) + index * sizeof(T));
     }
     
     size_t getIndex(T* ptr) {
-        return (reinterpret_cast<char*>(ptr) - reinterpret_cast<char*>(raw_)) / sizeof(T); 
+        return (reinterpret_cast<char*>(ptr) - reinterpret_cast<char*>(_raw)) / sizeof(T); 
     }
     
 public:
