@@ -12,6 +12,34 @@ tags:
 
 
 
+### AXI4 架构概览
+
+AXI4 通过将一次读写事务拆分为五条独立通道来实现并行：
+
+- **读地址通道**（Read Address Channel）
+- **读数据通道**（Read Data Channel）
+- **写地址通道**（Write Address Channel）
+- **写数据通道**（Write Data Channel）
+- **写响应通道**（Write Response Channel）
+
+五条通道互不阻塞，可同时进行握手与数据传输，可以有效降低等待时间。
+
+
+
+### AXI4 核心特性
+
+参考 AXI4 文档 [1]，AXI4 总线协议具有以下特点：
+
+- 独立的地址/控制和数据通道；
+- 使用字节选通来支持非对齐数据传输；
+- 可以使用一个地址发起突发数据传输；
+- 可以提供低成本直接内存访问（DMA）的独立的读写数据通道；
+- 可以发起多个超前传输；
+- 支持事务乱序完成；
+- 可以方便地添加流水段寄存器以完成时序收敛。
+
+
+
 ### AXI4 协议家族
 
 AMBA AXI4 协议其实是一个家族，主要包括以下三个子协议：
@@ -25,3 +53,9 @@ AMBA AXI4 协议其实是一个家族，主要包括以下三个子协议：
 
 
 在接下来的博客中，将分逐步介绍 AXI 总线的基本架构、信号定义以及进阶特性，帮助大家系统掌握这一关键通信协议。
+
+
+
+### 参考文献
+
+[1] [AMBA Specifications – Arm®](https://www.arm.com/architecture/system-architectures/amba/amba-specifications)
