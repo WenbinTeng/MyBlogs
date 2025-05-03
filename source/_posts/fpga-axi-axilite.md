@@ -60,10 +60,6 @@ AXI4-Lite 总线聚焦于低带宽的无突发简单事务传输，因此它相�
 | BREADY | 1    | Manager     | 主设备准备好接收响应            |
 | BRESP  | 2    | Subordinate | 响应码（OKAY/SLVERR/DECERR 等） |
 
-
-
-### 2. AXI4-Lite 传输流程
-
 AXI4-Lite 只支持单次传输，因此每次读写操作都是独立完成的，不支持 AXI4 中的突发传输和乱序响应等特性，其余的传输流程与 AXI4 类似：
 
 ##### 读传输流程
