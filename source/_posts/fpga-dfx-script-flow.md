@@ -9,7 +9,7 @@ typora-root-url: fpga-dfx-script-flow
 Vivado 提供的 Dynamic Function eXchange（DFX）功能是面向异构计算平台中模块级资源动态调度的重要机制，适用于多任务切换、系统热升级以及异构算力重调度等场景。本实验将介绍 Vivado 中基于 Tcl 脚本实现的 DFX 编译流程。以下是基本流程：
 
 - 首先，独立综合所有静态模块（Static Modules）和每个可重构区域的变体（Variants for each Reconfigurable Partitions）；
-- 然后，定义各个可重构区域的布局规划（Pblock），并实现该设计的初始配置；
+- 然后，定义各个可重构区域的布局规划（Pblock），并实现该设计的初始配置（Configuration）；
 - 接着，锁定设计的静态部分、使用变体更新可重构模块、重新运行实现可选配置；
 - 最后，验证每个实现的可重构模块是否与设计的静态部分兼容，如果兼容，则生成比特流。
 
