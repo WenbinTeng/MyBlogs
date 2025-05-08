@@ -27,6 +27,8 @@ DFX 编译流程仍基于 Vivado 的典型设计流程：综合（Synthesis）- 
 
 下载完成后，将文件解压至任意具备写权限的本地路径，然后进入解压后的 `led_shift_count_7s` 子目录。本实验中的所有步骤都将在该目录下完成。
 
+
+
 ### 2. 查看脚本功能
 
 首先，我们查看设计目录中提供的脚本文件。根目录下包括两个主要 Tcl 脚本：
@@ -156,7 +158,7 @@ DFX 编译流程仍基于 Vivado 的典型设计流程：综合（Synthesis）- 
    source run_dfx.tcl -notrace
    ```
 
-完成所有综合阶段之后，每个模块的结果将存放于 `Synth/` 子目录下，以模块名命名的子文件夹中可找到相应的日志与报告文件，以及最终生成的设计检查点（DCP）。主要日志包括：
+完成所有综合阶段之后，每个模块的结果将存放于 `Synth/` 子目录下，以模块名命名的子文件夹中可找到相应的日志与报告文件，以及最终生成的设计检查点（Design Check Point，DCP）。主要日志包括：
 
 - `run.log`：记录综合阶段的运行汇总信息；
 - `command.log`：打印脚本执行的完整 Tcl 命令序列；
@@ -200,14 +202,14 @@ DFX 编译流程仍基于 Vivado 的典型设计流程：综合（Synthesis）- 
    add_files ./Synth/Static/top_synth.dcp
    ```
 
-6. 加载板卡对应的顶层约束文件（XDC）。该约束文件包含引脚绑定和时钟定义，但不包含布局信息。
+6. 加载板卡对应的顶层约束文件（Xilinx Design Constraints，XDC）。该约束文件包含引脚绑定和时钟定义，但不包含布局信息。
 
    ```tcl
    add_files ./Sources/xdc/top_io_$board.xdc
    set_property USED_IN {implementation} [get_files ./Sources/xdc/top_io_$board.xdc]
    ```
 
-7. 分别加载 shift 和 count 模块综合生成的第一个 DCP，即 shift_right 和 count_up 的 DCP 文件。其中，SCOPED_TO_CELLS 属性确保对目标 Cell 的正确分配。
+7. 分别加载 shift 和 count 模块综合生成的第一个 DCP，即 shift_right 和 count_up 的 DCP 文件。其中，`SCOPED_TO_CELLS` 属性确保对目标 Cell 的正确分配。
 
    ```tcl
    add_files ./Synth/shift_right/shift_synth.dcp
