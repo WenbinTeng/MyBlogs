@@ -7,84 +7,167 @@ typora-root-url: fpga-dfx-project-flow
 
 # FPGA DFX Project Flow
 
-在本次实验中，我们将创建一个基于 RTL 设计的 DFX 工程。实验的顶层模块将使用两个可重构模块来输出 LED 图案，用以说明分区定义的细节。
+Vivado IDE 提供了完整的图形化流程来实现 Dynamic Function eXchange（DFX）功能。本文将通过一个基于 RTL 的工程，逐步展示如何在项目模式下使用 GUI 工具完成 DFX 设计流程。
 
-**1. 准备设计文件**
 
-下载 Xilinx 提供的[参考设计文件](https://www.xilinx.com/member/forms/download/design-license.html?cid=03e48cb4-ba89-496d-a3d7-cbaa2302ef79&filename=ug947-vivado-partial-reconfiguration-tutorial.zip)，解压后进入 `dfx_project/` 文件夹，假设路径为 `<Extract_Dir>`。
 
-**2. 加载工程和设计文件**
+### 1. 准备设计文件
 
-任何 DFX 设计流程（基于 Project 或 Shell 等）的第一个独特步骤是，定义设计中的可重构部分。这是通过项目模式下的分层源视图（Hierarchical Source View）中的上下文菜单完成的。以下步骤将通过在简单设计中定义分区，介绍项目的创建过程。
+从 Xilinx 官网下载官方 DFX 教程设计文件：
 
-我们在 Vivado 中创建一个 RTL 工程，然后将以下存放有源文件的文件夹添加到工程中
+[下载链接](https://www.xilinx.com/member/forms/download/design-license.html?cid=03e48cb4-ba89-496d-a3d7-cbaa2302ef79&filename=ug947-vivado-partial-reconfiguration-tutorial.zip)
 
-- `<Extract_Dir>\Sources\hdl\top`
-- `<Extract_Dir>\Sources\hdl\shift_right`
+下载完成后，将文件解压至任意具备写权限的本地路径，然后进入解压后的 `dfx_project` 子目录。本实验中的所有步骤都将在该目录下完成。
 
-再将以下约束文件添加到工程中
 
-- `<Extract_Dir>\Sources\xdc\top_io_<board>.xdc`
-- `<Extract_Dir>\Sources\xdc\pblocks_<board>.xdc`
 
-现在我们就创建了一个标准的 RTL 项目，没有任何 DFX 操作。
+### 2. 创建工程并加载设计文件
 
-![](/1.png)
+任何 DFX 设计流程（不管是基于 Project 还是 Tcl Shell）的首要步骤是，标记设计中可重构的部分。在 Vivado IDE 中是通过 Hierarchical Source View 中的上下文菜单完成的。以下操作将以一个简化的设计为例，说明如何创建并初始化一个带有可重构部分的 Vivado 工程：
 
-如要进行 DFX 操作，需要在导航栏中选择 Tools > Enable Dynamic Function eXchange，这个操作不能撤销，请在这之前做好项目备份。在随后的对话框中，单击 Convert 将此项目转换为 DFX 项目。
+1. 确保已正确提取 `dfx_project` 子目录。
 
-![](/2.png)
+2. 启动 Vivado IDE，点击 *Create Project*，然后点击 *Next*。
 
-右键单击 shift 实例，选择 Create Partition Definition。此操作将在设计中将两个 shift 实例定义为可重构分区。因为每个实例都来自同一个 RTL 源文件，所以它们在逻辑上是相同的。如果您不希望一个源文件的所有实例都被定义为可重构的，那么需要手动地另外定义一个新模块。上下文无关综合（Out-of-context synthesis）将保持该可重构模块与顶层模块分离的模式运行，并且一个综合后检查点（Checkpoint，一般指 Vivado 的 .dcp 文件）将用于两个 shift 实例。
+3. 设置工程路径为 `dfx_project` 目录。项目名称设置为 `project_1`，并勾选 *Create project subdirectory* 选项，然后点击 *Next*。
 
-在出现的对话框中，为分区定义和可重构模块命名。分区定义是将所有可重构模块插入其中的工作空间的通用引用，因此请给它一个适当的名称，例如 shifter。可重构模块指的是这个特定的RTL实例，所以给它起一个描述其功能的名字，比如 shift_right，然后单击 OK。
+4. 选择 *RTL Project*，并取消勾选 *Do not specify sources at this time*，然后点击 *Next*。
 
-![](/3.png)
+5. 进入 *Add Sources* 页面，添加以下设计源文件路径，然后点击 *Next*。
 
-Sources 窗口现在略有变化，两个 shift 实例现在都显示为黄色菱形，表明它们是分区。您还将在此窗口中看到 Partition Definitions 选项卡，其中显示设计中所有分区定义的列表和内容（此时只有一个）。此外，还创建了一个上下文无关模块运行来综合 shift_right 模块。
+   - `dfx_project/Sources/hdl/top`
+   - `dfx_project/Sources/hdl/shift_right`
 
-![](4.png)
+6. 进入 *Add Constraints* 页面，添加以下约束文件，然后点击 *Next*。
 
-此时，可以在 Dynamic Function eXchange Wizard 中操作以添加更多的可重构模块源文件。
+   - `dfx_project/Sources/xdc/top_io_<board>.xdc`
+   - ``dfx_project/Sources/xdc/pblocks_<board>.xdc``
 
-**3. 使用动态功能交换向导完成设计**
+7. 在 *Default Part* 页面选择目标开发板，确保选择与约束文件匹配的器件型号。点击 *Next* 完成创建，此时 Vivado IDE 将加载 RTL 项目并显示层次结构视图。
 
-在导航栏中进入 DFX 向导，点击 Next 进入 Edit Reconfigurable Modules 页面，可以看到 shift_right 可重构模块已经存在，我们点击“+”添加新的可重构模块，将以下文件夹添加到新模块中
+   <img src="1.png" style="zoom:80%;" />
 
-- `<Extract_Dir>\Sources\hdl\shift_left`
+8. 在菜单栏中选择 *Tools → Enable Dynamic Function eXchange*。此操作将使该工程启用 DFX 功能，注意：此更改不可撤销，建议在启用前进行项目备份。随后点击 *Convert*，Vivado 会将当前项目转换为 DFX 项目格式。
 
-如果有模块级的约束文件可以在这里添加，这里我们没有约束所以不作添加。将新的可重构模块命名为 shift_left，可重构分区选择 shifter，顶层模块字段保留为空，然后单击 OK 进行创建。现在 shifter 可重构分区下有两个可重构模块，单击 Next 继续。
+   <img src="2.png" style="zoom:80%;" />
 
-![](5.png)
+9. 在 Hierarchical Source 视图中，右键点击一个 `shift` 实例，选择 *Create Partition Definition*。Vivado 将识别两个 `shift` 实例属于相同 RTL 源，自动将它们映射为相同的可重构分区（Reconfigurable Partition，RP），并为其创建可重构分区。系统会自动对该模块执行一次脱离上下文综合（Out-of-Context Synthesis, OOC），并生成相应的 DCP。
 
-接下来选择 automatically create configurations 来让 DFX 向导来自动创建可重构配置。选择此选项后，将创建两个配置的最小集，配置的名称可以自定义。使用这两个可重构模块可以创建额外的配置，但是这里只需要两个就可以创建这版设计所需的所有部分比特流，因为任何可重构分区的可重构模块的最大数量是两个（不包括灰盒可重构模块）。点击 Next 继续。
+10. 在弹出的对话框中，为分区和可重构模块（Reconfigurable Module，RM）指定名称。分区名称为该 RP 的逻辑标识（如 `shifter`），RM 名称通常采用模块功能名（如 `shift_right`）。完成后点击 *OK*。
 
-![](7.png)
+    <img src="3.png" style="zoom:80%;" />
 
-与可重构配置类似，可以自动或手动创建用于实现每个配置的运行。运行之间如何交互将被视为父子关系，父运行实现静态设计和该配置中的所有可重构模块，然后子运行在已建立的上下文中实现该配置中的可重构模块时重用锁定的静态设计。选择 automatically create configuration runs 或者 Standard DFX 来自动创建运行。这将创建两次运行，由一个父配置（config_right）和一个子配置（config_left）组成。可以在此向导中创建任意数量的独立运行或相关运行，并为其中任何一个运行提供使用不同策略或约束集的选项。
+    现在 Source 窗口已经产生变化，两个 `shift` 实例都显示为黄色菱形，表示它们是分区。您还将在此窗口中看到 Partition Definitions 选项卡，其中显示设计中所有分区定义的列表和内容（此时只有一个）。此外，还创建了一个脱离上下文的运行（Run）来综合 shift_right 模块。
 
-![](9.png)
+    此时，Source 视图中的两个 `shift` 实例将显示为黄色菱形图标，表示它们已被标记为 RP。此外，界面还将新增 *Partition Definitions* 标签页，用于管理所有已定义的 RP 和 RM 实例。Vivado 还会为初始 RM 启动一条 OOC 综合运行流程。
 
-单击 Next 查看 Summary 页面，然后单击 Finish 完成设置并退出向导。
+    <img src="4.png" style="zoom:80%;" />
 
-**4. 综合并实现现有设计**
+    若需添加其他 RM，可使用 DFX 向导添加模块，后续将在下一节详细说明。
 
-在 IDE 中打开上述设计后，检查 Design Runs 窗口。顶层设计综合运行（synth_1）和父实现运行（impl_1）被标记为 active 。Flow Navigator应用于这些活动运行及其子运行，因此单击 Run Synthesis 或 Run Implementation 将设计应用于这些活动运行，以及完成它们所需的上下文无关综合运行。您也可以选择一个特定的父实现或子实现运行，右键单击并选择 Launch Runs，来完成整个流程。
 
-首先，在 Flow Navigator 中选择 Run Synthesis 来运行综合。综合运行将会首先综合上下文无关模块，然后再综合顶层模块。等待综合完成后，打开综合设计。在综合设计中我们可以看到已经定义的两个 Pblock，这是在约束文件 `pblocks_<board>.xdc` 中提供的，然后映射到两个 shift 实例。如果设计源代码中没有 Pblock，则可以在此步骤中创建它们。这可以通过右键单击设计层次结构中的 inst_shift 实例来选择 Floorplanning > Draw Pblock 来完成。每个实例都需要自己唯一的 Pblock。
 
-![](11.png)
+### 3. 使用 DFX 向导完成设计
 
-然后，通过选择 Reports > Report DRC 运行 DFX 特定的设计规则检查。为了节省时间，可以取消选中除 Dynamic Function eXchange 之外的所有复选框。DRC 会检查所提供的源文件和约束文件的报告没有错误。对于某些设备，可能会给出建议信息，用以提高 Pblock 的质量。对于这个简单的设计，这些可以忽略。
+Vivado 提供的 DFX 向导（Dynamic Function eXchange Wizard）可用于管理 RM 的添加、配置组合的定义、以及各实现运行的构建。在完成第一个 RM 的分区定义后，我们将通过该向导完成余下设置。
 
-![](12.png)
+##### 启动 DFX 向导
 
-接着，在 Flow Navigator 中，选择 Run Implementation 以在所有配置上运行布局布线。在本实验中，此操作首先运行 impl_1 的实现，然后运行 child_0_impl_1 的实现。除了本实验配置的两个运行的布局布线之外，Vivado 还会自动执行一些特定的 DFX 任务：
+在 IDE 中点击菜单栏 *Tools > Dynamic Function eXchange Wizard*，或在 Flow Navigator 中选择对应条目，点击 *Next* 进入向导。
 
-- 为每个布线的 shift_right 可重构模块写模块级别的上下文无关检查点。
-- 在顶层模块中为每个可重构分区划分逻辑以创建静态的设计映像。这是通过为每个实例调用命令 `update_design -black_box` 来完成的。
-- 锁定设计中静态部分的所有布局布线。这是通过调用 `lock_design -level` 布线完成的。
-- 保存锁定的静态父映像以供所有子运行重用。
+##### 添加可重构模块
 
-最后，在 Flow Navigator 中，点击 Generate Bitstream。此操作在活动的父运行上启动比特流生成，并在所有实现的子运行上启动 PR Verify，以确保设计图像的静态部分的一致性，再启动子运行的比特流生成。
+进入 *Edit Reconfigurable Modules* 页面时，已有的 `shift_right` 模块将自动显示。点击窗口左上角的蓝色 “+” 图标，添加新的 RM。在弹出的窗口中：
+
+- 点击 *Add Directories*，选择目录：`dfx_project/Sources/hdl/shift_left`；
+- 设置 RM 名称为 `shift_left`；
+- 关联的分区选择为之前定义的 `shift`；
+- 顶层模块字段保持为空；
+- 保持 Synthesize sources 复选框未勾选。
+
+点击 *OK* 完成添加。此时，`shift` RP 已拥有两个 RM 变体，点击 *Next* 继续。
+
+<img src="5.png" style="zoom:80%;" />
+
+##### 创建配置（Configuration）
+
+进入 *Edit Configurations* 页面。配置定义表示完整系统镜像（Image），包括静态设计及其在各 RP 上的 RM 映射关系。我们可以在 DFX 向导 中创建任何所需的配置集，或者简单地让 DFX 向导自动选择。
+
+这里选择 *automatically create configurations* 选项，DFX 向导将根据已有的 RM 自动生成最小配置集。执行此选项之后，Vivado 将创建拥有两个配置的最小集合，以包含所有的 RP 对应 RM 的映射组合。每个 `shift` 实例将在第一个配置中分配为 `shift_right`，在第二个配置中分配为 `shift_left`。每个配置的名称是可以修改的，如下图所示，配置的名称已经修改为 `config_right` 和 `config_left`，以反映每个模块中包含的可重构模块。
+
+<img src="7.png" style="zoom:80%;" />
+
+通过组合这两个 RM，最多可以生成四种不同的配置。但是 Vivado 只会为每个 RP 生成两个部分比特流文件，分别对应每个 RP 中的两个 RM，以最小化编译开销。点击 *Next* 继续。
+
+##### 设置实现运行（Configuration Runs）
+
+进入 *Edit Configuration Runs* 页面。与配置类似，用于实现每个配置的运行可以是自动创建或手动创建的。相关的运行之间将采用父子关系进行定义：父运行实现静态设计以及该配置中的所有 RM，然后子运行在已创建的上下文中重用锁定的静态设计，并在该配置中实现 RM。
+
+对于 UltraScale+ 设备，请使用 *Standard DFX* 以用最小运行集填充配置运行页面，并支持使用 *Abstract Shell* 配置不同的运行。对于 7 系列或 UltraScale 设备，选择 *automatically create configuration runs* 选项，而且不支持使用 *Abstract Shell*  生成配置。
+
+<img src="8.png" style="zoom:80%;" />
+
+本实验选择 *Standard DFX*，Vivado 会自动构建两个运行，分别对应父配置 `config_right` 和子配置 `config_left` 。你可以在该页面中添加更多运行，或为任一运行设置特定的约束与综合策略。
+
+<img src="9.png" style="zoom:80%;" />
+
+点击 *Next* 查看汇总页面，确认设置无误后点击 *Finish* 完成 DFX 向导。
+
+##### 查看设置结果
+
+在 DFX 向导中更新设计之后，可以看到 *Design Runs* 标签中已更新状态。DFX 向导为 `shift_left` RM 添加了一个 OOC Synthesize 运行，并在父运行（`impl_1`）下创建了一个子运行（`child_0_impl_1`）。
+
+<img src="10.png" style="zoom:80%;" />
+
+
+
+### 4. 综合并实现设计
+
+在配置好所有 RM 与配置后，即可进行综合（Synthesis）和实现（Implementation）阶段的编译工作。在 IDE 中，顶层设计的综合运行（`synth_1`）和父实现运行（`impl_1`）默认处于激活状态（“active”）。在 Flow Navigator 中发起的所有操作均针对这些激活的运行及其相关的 OOC 综合或子实现运行。你可以选择特定的父运行或者子运行，右键单击并选择 Launch Runs 以执行运行。以下是综合并实现设计的步骤：
+
+##### 运行综合
+
+在 Flow Navigator 中点击 *Run Synthesis*，在弹窗中确认后点击 *OK* 开始。Vivado 将首先综合所有 RM（OOC 运行），随后进行顶层设计的综合。完成后选择 *Open Synthesized Design* 打开综合结果。
+
+在已综合的设计中，可在 Device 视图看到两个已定义的 Pblock 区域。这些 Pblock 来源于约束文件 `pblocks_<board>.xdc`，分别映射到两个 `shift` 实例。若未提供该约束文件，也可通过以下方式手动创建：在设计层次结构中右键单击 `inst_shift` 实例并选择 *Floorplanning > Draw Pblock*。
+
+<img src="11.png" style="zoom:80%;" />
+
+在 Device 视图中选择某个 Pblock，查看其属性，可以看到最后两个属性是 `RESET_AFTER_RECONFIG`（仅 7 系列）和 `SNAPPING_MODE`，这两个属性是 DFX 特有的。
+
+点击 *Reports > Report DRC* 以执行检查，为了节省时间，可以取消选择除了 DFX 之外的所有复选框。
+
+<img src="12.png" style="zoom:80%;" />
+
+Vivado 将检查以下内容：
+
+- 约束文件与实际资源之间是否一致；
+- Pblock 是否正确对齐至时钟区域与合法列边界；
+- RP 是否满足所需资源数量；
+- 是否存在潜在的资源冲突或重构风险。
+
+对于 7 系列设备，建议启用 `SNAPPING_MODE` 以自动修正边界对齐问题，特别是与 Clock Region 和 INT 列相关的错误。如果你创建了自定义的布局规划，并且报告了 DRC 问题，请在继续之前修复这些问题。
+
+##### 运行实现
+
+在 Flow Navigator 中点击 *Run Implementation*，Vivado 将自动依次完成所有配置的布局与布线。在这里，此操作首先为 `impl_1` 运行实现，然后为 `child_0_impl_1` 运行实现。在后台，Vivado 会处理以下细节：
+
+- 为 `shift_right` RM 生成模块级别的（OOC）布线检查点；
+- 使用 ``update_design -black_box`` 命令将每个 RP 替换为黑盒以提取静态设计；
+- 使用 `lock_design -level routing` 命令锁定静态区域中的布局布线；
+- 保存锁定后的静态设计检查点，供所有子运行复用。
+
+若你仅希望实现其中一个配置运行，也可以在 *Design Runs* 窗口中单独选中目标运行右键执行。在启动子运行之前，必须成功完成父运行，因为子运行依赖于父运行的锁定静态设计。
+
+##### 验证并生成比特流
+
+当实现完成后，在弹出对话框中点击 *Cancel*。
+
+<img src="13.png" style="zoom:80%;" />
+
+现在，我们需要运行 PR Verify 来比较两个配置，以确保设计镜像中静态部分的一致性。这一步在 Vivado 中是默认执行的，也可以通过 `pr_verify` 命令来手动执行。
+
+接着，我们为配置生成比特流文件。在 Flow Navigator 中，点击 *Generate Bitstream*。Vivado 会在激活的父运行中启动比特流生成，并在所有已实现的子运行中启动 PR Verify 和比特流生成。对于每个配置运行，默认情况下都会生成完整比特流和部分比特流。
+
+至此，我们已经在 Vivado IDE 中的 GUI 中完成了所有 DFX 流程。此外，还有添加额外的可重构模块及其配置、创建和实现灰盒模块、修改设计源文件或选项等操作，详见官方文档。关于在 FPGA 设备上进行部分重构的操作，请参考 DFX 脚本流程。
 
