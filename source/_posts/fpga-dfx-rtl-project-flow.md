@@ -2,7 +2,7 @@
 title: fpga-dfx-rtl-flow
 date: 2024-05-23 13:56:09
 tags:
-typora-root-url: fpga-dfx-project-flow
+typora-root-url: fpga-dfx-rtl-project-flow
 ---
 
 # FPGA DFX RTL Project Flow
