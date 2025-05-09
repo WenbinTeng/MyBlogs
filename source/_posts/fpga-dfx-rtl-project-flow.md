@@ -5,7 +5,7 @@ tags:
 typora-root-url: fpga-dfx-project-flow
 ---
 
-# FPGA DFX Project Flow
+# FPGA DFX RTL Project Flow
 
 Vivado IDE 提供了完整的图形化流程来实现 Dynamic Function eXchange（DFX）功能。本文将通过一个基于 RTL 的工程，逐步展示如何在项目模式下使用 GUI 工具完成 DFX 设计流程。
 
