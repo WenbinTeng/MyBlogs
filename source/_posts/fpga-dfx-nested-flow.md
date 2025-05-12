@@ -108,7 +108,7 @@ typora-root-url: fpga-dfx-nested-flow
 
    <img src="2.png" style="zoom:80%;" />
 
-2. 执行第二个脚本，以创建第二级 RP
+2. 执行第二个脚本，以创建第二级 RP：
 
    ```tcl
    source subdivide_shifters.tcl
@@ -126,15 +126,62 @@ typora-root-url: fpga-dfx-nested-flow
    get_property HD.RECONFIGURABLE_CONTAINER [get_cells inst_RP]
    ```
 
-3. 执行第三个脚本，以实现移位器的 RM：
+3. 执行第三个脚本，以实现两个移位器的 RM：
 
    ```tcl
    source implement_sub_shifters.tcl -notrace
    ```
 
-   `implement_sub_shifters.tcl` 脚本将会为
+   `implement_sub_shifters.tcl` 脚本将会使用两种方法分别实现第二级 RP 中的 `shift_right` 和 `shift_left` 模块：
 
+   -  `shift_right` 模块的实现将使用仅包含初始静态设计的 DCP 构成的上下文作为起点。当前的第一级 RP 处于已布线但未锁定的状态；
+   - `shift_left` 模块的实现将使用包含静态设计与 RP 容器静态部分的 DCP 构成的上下文作为起点，当前的第一级 RP （容器）处于锁定的状态，是使用  `lock_design -level routing` 命令进行锁定后的结果。
 
+   <img src="5.png" style="zoom:80%;" />
+
+   两个模块实现完成之后，脚本将使用 `pr_recombine` 命令创建由两个 `shift_right` 模块填充两个第二级 RP 的 DCP，并将 `HD.RECONFIGURABLE` 属性移回 `inst_RP` 层级。可以通过检查 `top_shift_right_right_recombined.dcp` 的层次结构，看到属性已返回到 `inst_RP` 实例。
+
+   <img src="6.png" style="zoom:80%;" />
+
+4. 执行第四个脚本，以创建新的第二级 RP：
+
+   ```tcl
+   source subdivide_counters.tcl
+   ```
+
+   与第二个脚本类似，`subdivide_counters.tcl` 脚本会将设计中的第一级 RP 进一步重新划分为两个第二级 RP，用于实现计数器功能。这个设计中包含的顶层设计与第一个设计完全相同。
+
+   <img src="7.png" style="zoom:80%;" />
+
+5. 执行第五个脚本，以实现两个计数器的 RM：
+
+   ```tcl
+   source implement_sub_counters.tcl -notrace
+   ```
+
+   与第三个脚本的实现流程类似，`implement_sub_counters.tcl` 脚本使用标准的 DFX 流程实现第二级 RP 中的所有模块，在脚本最后使用 `pr_recombine` 命令重新组合并生成 DCP。
+
+   <img src="8.png" style="zoom:80%;" />
+
+##### 4.2 静态设计更新
+
+与标准的 DFX 设计流程一致，RM 的实现结果是根据静态设计构成的上下文中生成的。如果静态设计中的内容发生改变，那么该静态部分下的所有 RM 的必须重新实现，以确保所有内容保持同步。
+
+例如，如果顶层设计的静态部分有设计变更，则所有现有结果都应视为过时，必须重新编译所有内容。如果对一级可重构模块（如 `reconfig_shifters` 或 `reconfig_counters`）进行了更新，则依赖于修改模块的所有结果都需要重新编译。可以单独调用这些脚本中的任何一个，根据需要更新结果。
+
+##### 4.3 验证结果
+
+与标准的 DFX 设计流程一致，应使用 PR Verify 检查嵌套 DFX 设计生成的结果，以确认所有的结果保持同步。Vivado 的 `pr_verify` 命令将根据当前标记为可重构的单元对设计进行操作。鉴于此，应在相同的当前静态设计存在情况下进行同类比较。通过运行此脚本验证所有兼容配置：
+
+```tcl
+source verify_configurations.tcl
+```
+
+`verify_configurations.tcl` 脚本通过调用三次 `pr_verify` 比较了三对已经布线的设计，其内容如下：
+
+- `top_shift_right_right_recombined.dcp` vs `top_count_up_up_recombined.dcp`：这将比较两个重组后的 DCP，应该拥有完全相同的静态部分，并且包含一个 `inst_RP` RP。这两个 DCP 是标准的 DFX 设计，不包含任何嵌套结构。
+- `top_shift_right_right_route_design.dcp` vs `top_shift_left_left_route_design.dcp`：这将比较 `shift_right` 和 `shift_left` 的第二级检查点，由于这两个 DCP 的静态逻辑已锁定到上下子模块，因此比较的是顶层和 `reconfig_shifters` 层次结构之间的静态逻辑。
+- `top_count_up_up_route_design.dcp` vs `top_count_down_down_route_design.dcp`：与上一个比较类似，这将比较 `count_up` 和 `count_down` 的第二级检查点。
 
 
 
