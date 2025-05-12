@@ -7,30 +7,136 @@ typora-root-url: fpga-dfx-nested-flow
 
 # FPGA DFX Nested Flow
 
-本实验涵盖了一个简单的嵌套动态功能交换（Nested DFX）示例。嵌套 DFX 的概念是在一个动态区域内放置一个或多个动态区域，细分设备以允许更细粒度的重新配置。有了这个特性，您可以将一个可重构分区分割成更小的区域，每个区域都是部分可重构的。
+嵌套 DFX 允许在一个动态重构分区（Reconfigurable Partition，RP）内嵌套一个或多个区域，通过细分器件实现更精细化的重构。该特性允许将 RP 划分为多个子区域，每个子区域均可独立进行部分重构。
 
-本实验的设计是其他实验中使用的 LED-Shift-Count 设计的修改版本。不是简单地交换不同的移位器或不同的计数器，而是插入了一个额外的可重构层，使您能够在当前设计中拥有两个移位器或两个计数器。然后，这些移位器或计数器中的每一个都可以单独部分地重新配置。
+目前嵌套 DFX 尚不支持项目模式，因此本实验采用 Tcl 脚本流程作为演示示例。
 
-嵌套 DFX 在工程模式中还不受支持，所以需要使用 Tcl 脚本解决方案。
 
-**1. 准备设计文件**
 
-下载[参考设计文件](https://www.xilinx.com/member/forms/download/design-license.html?cid=03e48cb4-ba89-496d-a3d7-cbaa2302ef79&filename=ug947-vivado-partial-reconfiguration-tutorial.zip)，解压后进入 `nested_dfx` 目录，假设路径为 `<Extract_Dir>`。
+### 1. 准备设计文件
 
-**2. 阐述脚本功能**
+从 Xilinx 官网下载官方 DFX 教程设计文件：
 
-首先介绍综合脚本。文件 `run_synth.tcl`，`design_settings.tcl` 和 `advanced_settings.tcl` 位于根目录。`run_synth.tcl` 脚本包含运行此 DFX 设计的综合部分所需的最小设置，实现、验证和比特流生成是交互界面运行的。`design_settings.tcl` 脚本选择目标设备和单板，并为项目设置相对路径。`advanced_settings.tcl` 包含默认的工作流程设置，只能由有经验的用户修改。
+[下载链接](https://www.xilinx.com/member/forms/download/design-license.html?cid=03e48cb4-ba89-496d-a3d7-cbaa2302ef79&filename=ug947-vivado-partial-reconfiguration-tutorial.zip)
 
-接着介绍嵌套 DFX 相关脚本。在本实验中，在综合之后，您将使用单个 Tcl 命令逐步完成嵌套 DFX 工作流程。本实验旨在展示插入第二层可重构性所需的独特细节，因此强调了实现这一目标所需的新步骤，但是整个解决方案是完全可以通过脚本进行的。特定的部分被分组到脚本中，可以运行这些脚本来完成编译流的一部分。这些脚本中使用了显式的名称和路径，但它们当然可以在新设计中进行修改。这些脚本包括:
+下载完成后，将文件解压至任意具备写权限的本地路径，然后进入解压后的 `nested_dfx` 子目录。本实验中的所有步骤都将在该目录下完成。
 
-- `implement_parent_config.tcl`：这将实现顶层静态设计并建立一阶可重构分区（inst_RP），该分区稍后将被细分。
-- `subdivide_shifters.tcl`：这将一阶可重构分区细分为两个二级移位函数，每个函数部分可重构。
-- `subdivide_counters.tcl`：这将一阶可重构分区细分为两个二级计数函数，每个函数部分可重构。
-- `implement_sub_shifters.tcl`：它在 inst_RP 下面的两个二级可重构分区中实现了 shift_right 和 shift_left 可重构模块。
-- `implement_sub_counters.tcl`：它在 inst_RP 下面的两个二级可重构分区中实现了 count_up 和 count_down 可重构模块。
-- `verify_configurations.tcl`：它在对设计检查点上运行 pr_verify，以确认中包含的可重构模块的兼容性。
-- `generate_all_bitstreams.tcl`：它逐个打开检查点，为这个总体设计创建所有可能的部分比特流。
-- `run_all.tcl`：这将运行上面的所有脚本，从综合到比特流生成，以编译完整的教程设计。
+
+
+### 2. 查看脚本功能
+
+我们查看设计目录中提供的脚本文件，在根目录下有两种类型的脚本。
+
+##### 综合脚本
+
+在根目录下，包含三个在综合流程中会使用的脚本：
+
+- `run_synth.tcl`：用于控制在综合流程中哪些模块会被综合。
+- `design_settings.tcl`：用于设置目标开发板参数，并为项目设置相对路径。
+- `advanced_settings.tcl` 包含 DFX 工作流程参数的高级设置文件，一般不需要进行修改。
+
+##### 功能脚本
+
+在根目录下，包含用于实现嵌套 DFX 功能的脚本：
+
+- `implement_parent_config.tcl`：用于实现顶层静态设计并建立第一级 RP。
+- `subdivide_shifters.tcl`：用于将第一级 RP 细分为用于实现移位功能的两个第二级 RP。
+- `subdivide_counters.tcl`：用于将第一级 RP 细分为用于实现计数功能的两个第二级 RP。
+- `implement_sub_shifters.tcl`：用于实现第二级 RP 中的移位可重构模块（Reconfigurable Module，RM）。
+- `implement_sub_counters.tcl`：用于实现第二级 RP 中的计数 RM。
+- `verify_configurations.tcl`：用于对生成的设计检查点（Design Check Point，DCP）执行检查，以确保动态重构的兼容性。
+- `generate_all_bitstreams.tcl`：用于生成项目中的所有比特流。
+
+##### 流程脚本
+
+在根目录下，包含一个用于执行整个嵌套 DFX 编译流程的脚本：
+
+- `run_all.tcl`：按照顺序执行项目中的脚本，以自动进行综合-实现-生成比特流的流程。
+
+
+
+### 3. 综合设计
+
+`run_synth.tcl` 脚本用于自动化进行综合阶段，其将会执行七次综合步骤，一次用于顶层设计，两次用于第一级 RM，四次用于第二级 RM。具体使用步骤如下：
+
+1. 启动 Vivado Tcl Shell。
+
+2. 将当前的工作目录切换至 `nested_dfx` 。
+
+3. 确认 `run_synth.tcl` 中的 `xboard` 变量已经被修改为目标开发板型号。
+
+4. 在 Tcl 终端中执行以下命令以运行综合脚本：
+
+   ```tcl
+   source run_synth.tcl -notrace
+   ```
+
+   运行结束后，你可以在目录 `Synth/` 目录下查看所有模块的综合结果、日志于报告文件。主要的日志包括：
+
+   - `run.log`：记录综合阶段的运行汇总信息；
+   - `command.log`：打印脚本执行的完整 Tcl 命令序列；
+   - `critical.log`：汇总综合过程中出现的所有关键警告（Critical Warnings）。
+
+
+
+### 4. 集成设计并实现设计
+
+在所有的模块完成综合并生成相应的 DCP 后，即可利用这些检查点组合进行设计集成。这里我们将在 Tcl 终端中运行脚本以执行这一流程，你也可以在 Vivado IDE 的 GUI 中进行实现相关的操作。
+
+##### 4.1 集成与实现
+
+1. 执行第一个脚本，进行顶层设计的集成与实现：
+
+   ```tcl
+   source implement_parent_config.tcl -notrace
+   ```
+
+   `implement_parent_config.tcl` 脚本已经提供了集成与实现顶层设计的执行流程。顶层设计包括了静态设计和一个第一级 RP。这里，执行流程与标准 DFX 的执行流程一致。具体的执行流程大致为：
+
+   - 加载顶层设计 DCP 与板卡对应的约束文件；
+   - 加载 RM 综合生成的 DCP 与包含布局规划的约束文件；
+   - 使用 `link_design` 命令链接整个设计；
+   - 保存集成结果至 DCP 文件；
+   - 优化、布局和布线当前设计；
+   - 保存布线结果至 DCP 文件。
+
+   执行脚本后生成的 DCP 状态如下图所示：
+
+   <img src="1.png" style="zoom:80%;" />
+
+   打开已写入 `Implement/top_static` 文件夹的 `top_route_design.dcp` 文件，可以看到这是一个标准的 DFX 设计。第一级 RP `inst_RP` 具有 `HD.RECONFIGURABLE` 属性，并关联了一个 Pblock。
+
+   <img src="2.png" style="zoom:80%;" />
+
+2. 执行第二个脚本，以创建第二级 RP
+
+   ```tcl
+   source subdivide_shifters.tcl
+   ```
+
+   `subdivide_shifters.tcl` 脚本会将设计中的第一级 RP 进一步划分为两个第二级 RP。其中使用的 `pr_subdivide` 命令将为 `inst_RP` 移除 `HD.RECONFIGURABLE` 属性，并将其添加到两个第二级 RP 中，即 `inst_shift_upper` 和 `inst_shift_lower`。接着，其会为 `inst_RP` 添加 `HD.RECONFIGURABLE_CONTAINER` 属性，表明它在曾经是一个 RP。在生成的检查点 `top_static_shifters.dcp` 中可以看到上述变化。
+
+   <img src="3.png" style="zoom:80%;" />
+
+   <img src="4.png" style="zoom:80%;" />
+
+   `HD.RECONFIGURABLE_CONTAINER` 属性也可以通过检查 `inst_RP` 层次实例上的属性直接查询。使用以下 Tcl 命令进行查询的返回值将为 1。
+
+   ```tcl
+   get_property HD.RECONFIGURABLE_CONTAINER [get_cells inst_RP]
+   ```
+
+3. 执行第三个脚本，以实现移位器的 RM：
+
+   ```tcl
+   source implement_sub_shifters.tcl -notrace
+   ```
+
+   `implement_sub_shifters.tcl` 脚本将会为
+
+
+
+
 
 **3. 综合设计**
 
