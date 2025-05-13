@@ -275,4 +275,54 @@ source generate_all_bitstreams.tcl
 
 
 
-### 6. 总结
+### 6. 命令说明
+
+##### pr_subdivide
+
+该命令用于将一个 RP 分解为一个或多个更低级别的 RP。
+
+```
+pr_subdivide
+Description: Subdivide an RP into one or more lower-level 
+RPs when using the Nested Dynamic Function eXchange solution.
+Syntax: 
+pr_subdivide [-cell <arg>] [-subcells <arg>] [-quiet] [-verbose] [<from_dcp>]
+Usage: 
+Name     Description
+-------------------------
+[-cell]    (Required) Specify parent RP module name
+[-subcells]  (Required) Specify child RP module names
+[-quiet]   Ignore command errors
+[-verbose]  Suspend message limits during command execution
+[<from_dcp>] (Required) Specify OOC synthesized checkpoint path for the RM specified by option -cell
+```
+
+在 Vivado 中打开一个完全布线的初始设计检查点后，运行 pr_subdivide 将自动执行以下任务：
+
+- 执行 `lock_design -level routing` 命令将 RP 之外的静态逻辑锁定；
+- 执行 `update_design -black_box` 命令将 RP 替换为黑盒；
+- 加载一个 RP 对应的 RM 的综合后的 DCP，即命令中的 `<from_dcp>` 标识。该 RM 必须包含一个或多个层次结构实例。
+- 将 `HD.RECONFIGURABLE` 属性从初始分区（由 `-cell` 选项指定）转移到至一个或多个下级分区（由 `-subcells` 选项指定）。
+- 在初始分区上放置 `HD.RECONFIGURABLE_CONTAINER` 属性作为占位符，以供后续的 `pr_recombine` 命令使用。
+
+##### pr_recombine
+
+该命令用于移除所有较低级别的 RP，将 RP 定义恢复到父单元。
+
+```
+pr_recombine
+Description: Re-establish a parent cell as a RP while removing 
+lower-level RPs when using the Nested Dynamic Function 
+eXchange solution.
+Syntax: 
+pr_recombine [-cell <arg>] [-quiet] [-verbose]
+Usage: 
+Name    Description
+-----------------------
+[-cell]   (Required) Specify reconfigurable container module name
+[-quiet]  Ignore command errors
+[-verbose] Suspend message limits during command execution
+```
+
+`pr_recombine` 将 `HD.RECONFIGURABLE` 属性移动到目标单元，并从其下方的子单元中移除该属性。指定的单元必须拥有由 `pr_subdivide` 设置的 `HD.RECONFIGURABLE_CONTAINER` 属性，以标识其为有效目标。
+
