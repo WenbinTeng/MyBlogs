@@ -139,7 +139,7 @@ Vivado 的嵌套 DFX （Nested DFX）功能允许在一个动态重构分区（R
 
    <img src="5.png" style="zoom:80%;" />
 
-   这两种方法都能让模块正确地实现。个人感觉这两种流程在生成的结果上没有区别，只是第一次实现两个第二级 RM 时，还无法确切地知道第二级 RM 的接口在第一级 RP 中的布局布线（可以类比于第一级 RM在顶层设计中实现的过程，锁定的顶层设计静态部分 DCP 是在第一个 RM 实现之后才生成的。因此，这是一个嵌套的过程。）。为第一级 RP 生成锁定的 DCP 能为第二级 RM 的实现增强隔离性，减少布线错误。
+   这两种方法都能让模块正确地实现。个人感觉这两种流程在生成的结果上没有区别，只是第一次实现两个第二级 RM 时，还无法确切地知道第二级 RM 的接口在第一级 RP 中的布局布线（可以类比于第一级 RM 在顶层设计中实现的过程，锁定的顶层设计静态部分 DCP 是在第一个 RM 实现之后才生成的。因此，这是一个嵌套的过程。）。为第一级 RP 生成锁定的 DCP 能为第二级 RM 的实现增强隔离性，减少布线错误。
 
    两个模块实现完成之后，脚本将使用 `pr_recombine` 命令，将两个 `shift_right` RM 填充到两个第二级 RP 中，并生成 DCP。同时，这个命令会将 `HD.RECONFIGURABLE` 属性移回 `inst_RP` 层级。可以通过检查 `top_shift_right_right_recombined.dcp` 的层次结构，看到该属性已返回到 `inst_RP` 实例。
 
@@ -307,7 +307,7 @@ Name     Description
 
 ##### pr_recombine
 
-该命令用于移除所有较低级别的 RP，将 RP 定义恢复到父单元。
+该命令用于移除所有较低级别的 RP，将 RP 定义恢复到父单元（Parent Cell）。
 
 ```
 pr_recombine
@@ -324,5 +324,5 @@ Name    Description
 [-verbose] Suspend message limits during command execution
 ```
 
-`pr_recombine` 将 `HD.RECONFIGURABLE` 属性移动到目标单元，并从其下方的子单元中移除该属性。指定的单元必须拥有由 `pr_subdivide` 设置的 `HD.RECONFIGURABLE_CONTAINER` 属性，以标识其为有效目标。
+`pr_recombine` 将 `HD.RECONFIGURABLE` 属性移动到目标单元，并从其下方的子单元（Subcell）中移除该属性。指定的单元必须拥有由 `pr_subdivide` 设置的 `HD.RECONFIGURABLE_CONTAINER` 属性，以标识其为有效目标。
 
