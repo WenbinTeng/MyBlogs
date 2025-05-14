@@ -78,6 +78,8 @@ typora-root-url: fpga-dfx-project-flow-debug
 
 1. 依次点击菜单栏 *Tools > Enable Dynamic Function eXchange*，在弹出的对话框中点击 *Convert*，将当前项目转换为支持 DFX 的项目。
 
+   <img src="3.png" style="zoom:80%;" />
+
 2. 在 Sources 窗口中右键点击 `my_math` 实例，选择 *Create Partition Definition*。
 
    此操作会将该模块标记为 RP，并自动执行一次脱离上下文综合（Out-of-Context Synthesis, OOC Synthesize），将其逻辑从顶层设计中剥离出来，以支持模块级替换。
