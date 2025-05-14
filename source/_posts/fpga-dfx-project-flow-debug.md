@@ -135,8 +135,12 @@ Vivado IDE 中的 DFX 向导（Dynamic Function eXchange Wizard）用于集中�
 9. 选择 *Standard DFX* 或者 *automatically create configuration runs* 以自动创建最小运行集合。运行（Run）是实现配置的任务。在 DFX 向导中，你可以创建任意数量的独立或相关运行，并为它们中的每一个选择不同的策略或约束集。
 
    现在 Vivado 已经自动创建了两个运行，以实现一个父配置（`config_mult`）和一个子配置（`config_add`）。请注意，自动生成运行的名称是不可编辑的。
-   
+
+   <img src="9.png" style="zoom:80%;" />
+
 10. 点击 *Next* 进入 *Summary* 页面，并点击 *Finish* 以完成设置并退出 DFX 向导。在 Vivado IDE 中，可以看到，设计运行窗口已更新。Vivado 为 `math` RM 添加了第二个 OOC 综合运行，并在父实现运行（`impl_1`）下创建了一个子实现运行（`child_0_impl_1`）。
+
+    <img src="10.png" style="zoom:80%;" />
 
 
 
