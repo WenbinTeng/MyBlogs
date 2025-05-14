@@ -244,59 +244,61 @@ DFX 编译流程仍基于 Vivado 的典型设计流程：综合（Synthesis）- 
 
 2. 在 Properties 视图中，选择 `RESET_AFTER_RECONFIG` 复选框，以确保在完成动态重构后自动初始化该模块逻辑的初始状态。
 
-2. 对 `inst_shift` 实例重复上述步骤 1 和 2，在时钟区域 `X1Y1` 的右侧绘制第二个 Pblock。由于该模块包含 Block RAM 实例，因此其对应的 Pblock 必须覆盖足够的 BRAM 资源，否则 Statistics 面板中的 RAMB 项将以红色高亮显示，提示资源不足。
+3. 对 `inst_shift` 实例重复上述步骤 1 和 2，在时钟区域 `X1Y1` 的右侧绘制第二个 Pblock。由于该模块包含 Block RAM 实例，因此其对应的 Pblock 必须覆盖足够的 BRAM 资源，否则 Statistics 面板中的 RAMB 项将以红色高亮显示，提示资源不足。
 
    <img src="2.png" style="zoom:80%;" />
-   
-2. 打开 Reports 菜单，选择 *Report DRC*，运行 DFX 设计规则检查。可取消勾选 “All Rules”，仅选择 “Dynamic Function eXchange” 类别，以聚焦与 DFX 相关的 DRC 报告。
+
+4. 打开 Reports 菜单，选择 *Report DRC*，运行 DFX 设计规则检查。可取消勾选 “All Rules”，仅选择 “Dynamic Function eXchange” 类别，以聚焦与 DFX 相关的 DRC 报告。
 
    <img src="3.png" style="zoom:80%;" />
-   
+
    运行后通常会触发一到两个 DRC 违规，本实验将分别对两个实例演示如何处理这些典型违规。
-   
-2. 第一个 DRC 违规是错误，HDPR-10，指出启用了 `RESET_AFTER_RECONFIG` 的 Pblock 必须沿时钟区域边界对齐。为修复该问题，需要手动调整 `inst_shift` 的 Pblock，使其上边界与下边界严格贴合 `X1Y1` 时钟区域的顶部与底部，如下图所示。
+
+5. 第一个 DRC 违规是错误，HDPR-10，指出启用了 `RESET_AFTER_RECONFIG` 的 Pblock 必须沿时钟区域边界对齐。为修复该问题，需要手动调整 `inst_shift` 的 Pblock，使其上边界与下边界严格贴合 `X1Y1` 时钟区域的顶部与底部，如下图所示。
 
    <img src="4.png" style="zoom:80%;" />
-   
-2. 第二个可能出现的 DRC 违规是一个警告，HDPR-26，指出 Pblock 的左右边缘没有落在合法的列边界上。Vivado DFX 要求 Pblock 的左右边界不得横跨 INT 列（内部互连列）。解决方案是放大视图定位违规边界，然后将 Pblock 左/右边缘微调至两个合法资源（如 CLB-CLB 或 CLB-RAMB）之间的边界，而不是落在 CLB-INT 或 RAMB-INT 之间，如下图所示。
+
+6. 第二个可能出现的 DRC 违规是一个警告，HDPR-26，指出 Pblock 的左右边缘没有落在合法的列边界上。Vivado DFX 要求 Pblock 的左右边界不得横跨 INT 列（内部互连列）。解决方案是放大视图定位违规边界，然后将 Pblock 左/右边缘微调至两个合法资源（如 CLB-CLB 或 CLB-RAMB）之间的边界，而不是落在 CLB-INT 或 RAMB-INT 之间，如下图所示。
 
    <img src="5.png" style="zoom:80%;" />
-   
-2. 修正后再次运行 DRC 检查，确认所有错误与警告已被清除。
 
-2. 除手动微调边界外，也可使用 `SNAPPING_MODE` 属性自动修正 Pblock 的对齐方式。在 Device 窗口中选择对应的 Pblock，并在 Pblock Properties 窗口的 Properties 视图中，将 `SNAPPING_MODE` 的值从 `OFF` 更改为 `ROUTING` （或 `ON`）。设置该属性将自动根据时钟区域与资源列边界调整 Pblock 尺寸，确保其满足重构对齐要求。特别地，若启用 `RESET_AFTER_RECONFIG`，Vivado 会强制拉高 Pblock，自动扩展其高度覆盖完整时钟区域。需要注意，使用 `SNAPPING_MODE` 后，Pblock 的可用资源数量和类型可能会发生变化，因此建议在设置后重新检查其资源布局。
+7. 修正后再次运行 DRC 检查，确认所有错误与警告已被清除。
 
-2. 最终再次执行 DRC，确认所有限制已满足。如果 Pblock 接近器件边缘，可能仍会看到部分建议类信息（Info），但不会影响设计有效性。
+8. 除手动微调边界外，也可使用 `SNAPPING_MODE` 属性自动修正 Pblock 的对齐方式。在 Device 窗口中选择对应的 Pblock，并在 Pblock Properties 窗口的 Properties 视图中，将 `SNAPPING_MODE` 的值从 `OFF` 更改为 `ROUTING` （或 `ON`）。设置该属性将自动根据时钟区域与资源列边界调整 Pblock 尺寸，确保其满足重构对齐要求。特别地，若启用 `RESET_AFTER_RECONFIG`，Vivado 会强制拉高 Pblock，自动扩展其高度覆盖完整时钟区域。需要注意，使用 `SNAPPING_MODE` 后，Pblock 的可用资源数量和类型可能会发生变化，因此建议在设置后重新检查其资源布局。
 
-2. 使用以下命令保存当前的布局规划与所有约束设置。
+9. 最终再次执行 DRC，确认所有限制已满足。如果 Pblock 接近器件边缘，可能仍会看到部分建议类信息（Info），但不会影响设计有效性。
+
+10. 使用以下命令保存当前的布局规划与所有约束设置。
 
    ```tcl
    write_xdc ./Sources/xdc/top_all.xdc
    ```
-   
+
    此命令将导出当前设计中所有生效的 XDC 约束文件，包括早前加载的 `top_io_$board.xdc` 中的引脚与时钟约束。这些约束可以在它们自己的 XDC 约束文件中进行管理，也可以在运行脚本中进行管理（通常与 `HD.RECONFIGURABLE` 一起使用）。
-   
+
    如果需要单独提取单独的 Pblock 约束，可以使用 `hd_utils.tcl` 脚本帮助完成该操作：
-   
+
    1. 读取并执行 `hd_utils.tcl` 脚本中的命令。
-   
+
       ```tcl
       source ./Tcl_HD/hd_utils.tcl
       ```
-   
+
    2. 使用 `export_pblocks` 命令来输出 Pblock 的约束信息。
-   
+
       ```tcl
       export_pblocks -file ./Sources/xdc/pblocks.xdc
       ```
-   
+
       该命令将为设计中的每个 Pblock 生成约束语句。你也可以使用 `-pblocks` 选项指定导出其中某一个。
 
 
 
 ### 6. 实现第一个配置
 
-本节将对当前的静态设计及其所包含的 RM 进行布局与布线，从而完成第一个完整配置的实现结果。该配置将在后续其他 RM 变体的实现流程中被重用。实现的具体步骤如下：
+本节将对当前的静态设计及其所包含的 RM 进行布局与布线，从而完成第一个完整配置的实现结果。该配置将在后续其他 RM 变体的实现流程中被重用。
+
+##### 实现设计
 
 1. 优化、布局和布线静态设计。
 
@@ -322,6 +324,8 @@ DFX 编译流程仍基于 Vivado 的典型设计流程：综合（Synthesis）- 
    ```
 
 4. 在 Vivado 中使用布线资源工具栏按钮，可以在抽象布线信息和实际布线信息显示模式之间切换。在实际布线信息显示模式中，此时设计中的所有网络（Nets）应该是完全布线的。
+
+   <img src="7.png" style="zoom:80%;" />
 
 ##### 保存配置实现结果
 
@@ -364,11 +368,11 @@ DFX 编译流程仍基于 Vivado 的典型设计流程：综合（Synthesis）- 
 
    下图显示了 `inst_shift` 实例在执行 `update_design` 命令之前的状态。
 
-   <img src="7.png" style="zoom:80%;" />
+   <img src="8.png" style="zoom:80%;" />
 
    下图显示了 `inst_shift` 实例在执行 `update_design` 命令之后的状态。
 
-   <img src="8.png" style="zoom:80%;" />
+   <img src="9.png" style="zoom:80%;" />
 
 2. 使用 `lock_design` 命令以锁定当前的布线状态。
 
@@ -378,7 +382,7 @@ DFX 编译流程仍基于 Vivado 的典型设计流程：综合（Synthesis）- 
 
    由于未指定具体 cell，该命令将锁定设计中所有已布线对象，包括静态设计与 Partition Pins。被锁定的组件在布局视图中将由蓝色变为橙色，布线由实线变为虚线。
 
-   <img src="9.png" style="zoom:80%;" />
+   <img src="10.png" style="zoom:80%;" />
 
 3. 将当前设计保存为检查点以供后续使用。
 
@@ -437,7 +441,7 @@ DFX 编译流程仍基于 Vivado 的典型设计流程：综合（Synthesis）- 
 
    运行结束后，静态设计部分仍然是虚线以表示锁定状态，新增的 RM 布线则以实线显示，如下图所示。
 
-   <img src="10.png" style="zoom:80%;" />
+   <img src="11.png" style="zoom:80%;" />
 
 ##### 保存配置实现结果
 
@@ -483,7 +487,11 @@ DFX 编译流程仍基于 Vivado 的典型设计流程：综合（Synthesis）- 
    ```
    
 
-执行上述命令后，Vivado 会在 Device 视图中以对应颜色高亮显示每个 Pblock 的所有逻辑帧区域。这些被高亮的区域即为后续比特流生成过程中参与部分重构的目标区域。特别需要注意的是：若某个 Pblock 启用了 `RESET_AFTER_RECONFIG` 或 `SNAPPING_MODE` 属性，其边界将自动扩展以匹配完整时钟区域或帧对齐需求。因此，Pblock 的实际物理范围可能超出用户原先绘制的矩形。
+执行上述命令后，Vivado 会在 Device 视图中以对应颜色高亮显示每个 Pblock 的所有逻辑帧区域。
+
+<img src="12.png" style="zoom:80%;" />
+
+这些被高亮的区域即为后续比特流生成过程中参与部分重构的目标区域。特别需要注意的是：若某个 Pblock 启用了 `RESET_AFTER_RECONFIG` 或 `SNAPPING_MODE` 属性，其边界将自动扩展以匹配完整时钟区域或帧对齐需求。因此，Pblock 的实际物理范围可能超出用户原先绘制的矩形。
 
 其他脚本的说明：
 
