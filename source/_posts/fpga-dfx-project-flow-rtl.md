@@ -93,7 +93,11 @@ Vivado 提供的 DFX 向导（Dynamic Function eXchange Wizard）可用于管理
 
 进入 *Edit Configurations* 页面。配置定义表示完整系统镜像（Image），包括静态设计及其在各 RP 上的 RM 映射关系。我们可以在 DFX 向导中创建任何所需的配置集，或者简单地让 DFX 向导自动选择。
 
-这里选择 *automatically create configurations* 选项，DFX 向导将根据已有的 RM 自动生成最小配置集。执行此选项之后，Vivado 将创建拥有两个配置的最小集合，以包含所有的 RP 对应 RM 的映射组合。每个 `shift` 实例将在第一个配置中分配为 `shift_right`，在第二个配置中分配为 `shift_left`。每个配置的名称是可以修改的，如下图所示，配置的名称已经修改为 `config_right` 和 `config_left`，以反映每个模块中包含的可重构模块。
+这里选择 *automatically create configurations* 选项，DFX 向导将根据已有的 RM 自动生成最小配置集。
+
+<img src="6.png" style="zoom:80%;" />
+
+执行此选项之后，Vivado 将创建拥有两个配置的最小集合，以包含所有的 RP 对应 RM 的映射组合。每个 `shift` 实例将在第一个配置中分配为 `shift_right`，在第二个配置中分配为 `shift_left`。每个配置的名称是可以修改的，如下图所示，配置的名称已经修改为 `config_right` 和 `config_left`，以反映每个模块中包含的可重构模块。
 
 <img src="7.png" style="zoom:80%;" />
 
