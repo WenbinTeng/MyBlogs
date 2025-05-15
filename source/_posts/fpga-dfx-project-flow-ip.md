@@ -93,11 +93,11 @@ typora-root-url: fpga-dfx-project-flow-ip
 
    <img src="7.png" style="zoom:80%;" />
 
-   你还将在 Sources 视图中看到新的 BD 文件已添加至工程中，`rp1rm1.bd` 的条目会显示在 `design_1.bd` 的子节点中。
+   你还将在 Sources 窗口中看到新的 BD 文件已添加至工程中，`rp1rm1.bd` 的条目会显示在 `design_1.bd` 的子节点中。
 
    <img src="8.png" style="zoom:80%;" />
 
-   注意，BDC 创建完成后，原 `rp1` 层次结构在 `design_1` 中将变为只读状态，无法直接编辑。要修改其中的设计内容，必须从 Sources 视图中打开并编辑 `rp1rm1.bd`。
+   注意，BDC 创建完成后，原 `rp1` 层次结构在 `design_1` 中将变为只读状态，无法直接编辑。要修改其中的设计内容，必须从 Sources 窗口中打开并编辑 `rp1rm1.bd`。
 
 3. 打开顶层模块设计，切换到 *Address Editor* 选项卡。展开 Network 0 信息，找到 `/rp1/axi_gpio_1/S_AXI`，修改其地址范围为 64K，以匹配后续 RM 的接口定义。
 
@@ -205,11 +205,11 @@ typora-root-url: fpga-dfx-project-flow-ip
 
 目录中的 `run_impl.tcl` 脚本可自动完成本阶段操作，但此处采用 GUI 操作方式逐步展示：
 
-1. 在 *Sources* 窗口中，右键单击 `design_1.bd` 并选择 *Create HDL Wrapper*。在弹出的对话框中选择默认选项 *Let Vivado manage wrapper and auto-update*，然后点击 *OK*。
+1. 在 Sources 窗口中，右键单击 `design_1.bd` 并选择 *Create HDL Wrapper*。在弹出的对话框中选择默认选项 *Let Vivado manage wrapper and auto-update*，然后点击 *OK*。
 
    Vivado 会自动为顶层 BD 创建一个 Verilog 封装文件 `design_1_wrapper.v`，该文件实例化了完整的 BD，并将其作为综合与实现的入口模块。
 
-2. 在 *Flow Navigator* 中，点击 *IP Integrator > Generate Block Design*。在弹出窗口中确认选项 *Out of context per IP*，点击 *Generate* 开始执行。
+2. 在 Flow Navigator 中，点击 *IP Integrator > Generate Block Design*。在弹出窗口中确认选项 *Out of context per IP*，点击 *Generate* 开始执行。
 
    <img src="18.png" style="zoom:80%;" />
 
@@ -229,7 +229,7 @@ Vivado 提供了 DFX 向导（Dynamic Function eXchange Wizard），用于图形
 
 以下是定义配置与运行的具体步骤：
 
-1. 在 *Flow Navigator* 或 *Tools* 菜单中点击 Dynamic Function eXchange Wizard 以启动 DFX 向导，然后点击 *Next* 继续。
+1. 在 Flow Navigator 或 Tools 菜单中点击 *Dynamic Function eXchange Wizard* 以启动 DFX 向导，然后点击 *Next* 继续。
 
    <img src="19.png" style="zoom:80%;" />
 
@@ -257,13 +257,13 @@ Vivado 提供了 DFX 向导（Dynamic Function eXchange Wizard），用于图形
 
 ### 9. 为可重构分区添加设计约束
 
-在 DFX 设计中，每个 RP 都必须通过 Pblock 指定其布局规划（Floorplan）。Pblock 是 Vivado 用于物理布局规划的边界约束区域，用于确保各个 RM 在实现过程中拥有一致的资源范围。
+在 DFX 设计中，每个 RP 都必须通过 Pblock 指定其布局规划（Floorplanning）。Pblock 是 Vivado 用于物理布局规划的边界约束区域，用于确保各个 RM 在实现过程中拥有一致的资源范围。
 
 在本项目中，Pblock 约束已预定义于 `ipi_bdc_dfx_zu/constraints/pblocks.xdc` 文件中。
 
 以下是添加约束的步骤：
 
-1. 在 *Sources* 窗口中点击+按钮，打开 *Add Sources* 对话框。选择 *Add or Create Constraints*，然后点击 *Next*。点击 *Add Files*，定位至约束文件路径。选中该文件后点击 *Finish* 以将约束文件添加至项目中。
+1. 在 Sources 窗口中点击+按钮，打开 *Add Sources* 对话框。选择 *Add or Create Constraints*，然后点击 *Next*。点击 *Add Files*，定位至约束文件路径。选中该文件后点击 *Finish* 以将约束文件添加至项目中。
 
    如有需要，你可以打开综合后的设计来查看为此设计创建的 Pblock。
 

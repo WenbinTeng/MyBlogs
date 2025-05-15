@@ -77,7 +77,7 @@ Vivado 提供的 DFX 向导（Dynamic Function eXchange Wizard）可用于管理
 
 ##### 添加可重构模块
 
-进入 *Edit Reconfigurable Modules* 页面时，已有的 `shift_right` 模块将自动显示。点击窗口左上角的蓝色 “+” 图标，添加新的 RM。在弹出的窗口中：
+进入 *Edit Reconfigurable Modules* 页面时，已有的 `shift_right` 模块将自动显示。点击窗口左上角的蓝色+图标，添加新的 RM。在弹出的窗口中：
 
 - 点击 *Add Directories*，选择目录：`dfx_project/Sources/hdl/shift_left`；
 - 设置 RM 名称为 `shift_left`；
@@ -91,9 +91,13 @@ Vivado 提供的 DFX 向导（Dynamic Function eXchange Wizard）可用于管理
 
 ##### 创建配置（Configuration）
 
-进入 *Edit Configurations* 页面。配置定义表示完整系统镜像（Image），包括静态设计及其在各 RP 上的 RM 映射关系。我们可以在 DFX 向导 中创建任何所需的配置集，或者简单地让 DFX 向导自动选择。
+进入 *Edit Configurations* 页面。配置定义表示完整系统镜像（Image），包括静态设计及其在各 RP 上的 RM 映射关系。我们可以在 DFX 向导中创建任何所需的配置集，或者简单地让 DFX 向导自动选择。
 
-这里选择 *automatically create configurations* 选项，DFX 向导将根据已有的 RM 自动生成最小配置集。执行此选项之后，Vivado 将创建拥有两个配置的最小集合，以包含所有的 RP 对应 RM 的映射组合。每个 `shift` 实例将在第一个配置中分配为 `shift_right`，在第二个配置中分配为 `shift_left`。每个配置的名称是可以修改的，如下图所示，配置的名称已经修改为 `config_right` 和 `config_left`，以反映每个模块中包含的可重构模块。
+这里选择 *automatically create configurations* 选项，DFX 向导将根据已有的 RM 自动生成最小配置集。
+
+<img src="6.png" style="zoom:80%;" />
+
+执行此选项之后，Vivado 将创建拥有两个配置的最小集合，以包含所有的 RP 对应 RM 的映射组合。每个 `shift` 实例将在第一个配置中分配为 `shift_right`，在第二个配置中分配为 `shift_left`。每个配置的名称是可以修改的，如下图所示，配置的名称已经修改为 `config_right` 和 `config_left`，以反映每个模块中包含的可重构模块。
 
 <img src="7.png" style="zoom:80%;" />
 
@@ -123,7 +127,7 @@ Vivado 提供的 DFX 向导（Dynamic Function eXchange Wizard）可用于管理
 
 ### 4. 综合并实现设计
 
-在配置好所有 RM 与配置后，即可进行综合（Synthesis）和实现（Implementation）阶段的编译工作。在 IDE 中，顶层设计的综合运行（`synth_1`）和父实现运行（`impl_1`）默认处于激活状态（“active”）。在 Flow Navigator 中发起的所有操作均针对这些激活的运行及其相关的 OOC 综合或子实现运行。你可以选择特定的父运行或者子运行，右键单击并选择 Launch Runs 以执行运行。以下是综合并实现设计的步骤：
+在配置好所有 RM 与配置后，即可进行综合（Synthesis）和实现（Implementation）阶段的编译工作。在 IDE 中，顶层设计的综合运行（`synth_1`）和父实现运行（`impl_1`）默认处于激活状态（“active”）。在 Flow Navigator 中发起的所有操作均针对这些激活的运行及其相关的 OOC 综合或子实现运行。你可以选择特定的父运行或者子运行，右键单击并选择 *Launch Runs* 以执行运行。以下是综合并实现设计的步骤：
 
 ##### 运行综合
 

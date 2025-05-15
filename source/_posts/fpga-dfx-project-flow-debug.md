@@ -58,7 +58,7 @@ typora-root-url: fpga-dfx-project-flow-debug
 
     如果某些 IP 显示红色锁标志，请通过 *Reports > Report IP Status* 检查其状态。如有需要，点击 *Upgrade Selected* 选项以更新 IP 到最新版本。
 
-11. 在 *Flow Navigator* 中，展开 *Project Manager*，打开 *IP Catalog*，选择 *Debug & Verification > Debug*。
+11. 在 Flow Navigator 中，展开 *Project Manager*，打开 *IP Catalog*，选择 *Debug & Verification > Debug*。
 
 12. 右键点击集成逻辑分析仪（Integrated Logic Analyzer，ILA），并选择 *Customize IP*。在 *General Options* 选项卡以及 *Probe_Ports(0..0)* 选项卡中，自定义配置以下字段：
 
@@ -77,6 +77,8 @@ typora-root-url: fpga-dfx-project-flow-debug
 在插入 ILA 之后，即可为设计中的实例创建可重构分区（Reconfigurable Partition, RP）。具体步骤如下：
 
 1. 依次点击菜单栏 *Tools > Enable Dynamic Function eXchange*，在弹出的对话框中点击 *Convert*，将当前项目转换为支持 DFX 的项目。
+
+   <img src="3.png" style="zoom:80%;" />
 
 2. 在 Sources 窗口中右键点击 `my_math` 实例，选择 *Create Partition Definition*。
 
@@ -102,7 +104,7 @@ typora-root-url: fpga-dfx-project-flow-debug
 
 Vivado IDE 中的 DFX 向导（Dynamic Function eXchange Wizard）用于集中管理 Reconfigurable Modules（RM）、配置（Configurations）与实现运行（Runs）。以下是使用 DFX 向导进行设计的具体步骤：
 
-1. 在 *Flow Navigator* 或 *Tools* 菜单中点击 *Dynamic Function eXchange Wizard*，然后点击 *Next* 开始。
+1. 在 Flow Navigator 或 Tools 菜单中点击 *Dynamic Function eXchange Wizard*，然后点击 *Next* 开始。
 
 2. 进入 *Edit Reconfigurable Modules* 页面，可以看到已有的 `mult` RM。点击左侧的+按钮添加新的 RM。
 
@@ -122,7 +124,7 @@ Vivado IDE 中的 DFX 向导（Dynamic Function eXchange Wizard）用于集中�
 
 6. 点击 *Next* 进入 *Edit Configuration* 页面。
 
-7. 选择 *automatically create configurations* 以让 DFX 向导自动创建配置。配置（Configuration）是包含静态设计和每个 RP 一个 RM 的完整设计镜像。你可以在 DFX 向导中创建任何所需的配置。
+7. 选择 *automatically create configurations* 以让 DFX 向导自动创建配置。配置（Configuration）是包含静态设计和每个 RP 一个 RM 的完整设计镜像（Image）。你可以在 DFX 向导中创建任何所需的配置。
 
    现在 Vivado 已经自动创建了包含两个配置的最小集合，`math` 分区在两个配置中分别被分配了 `mult` 模块与 `add` 模块。
 
@@ -133,8 +135,12 @@ Vivado IDE 中的 DFX 向导（Dynamic Function eXchange Wizard）用于集中�
 9. 选择 *Standard DFX* 或者 *automatically create configuration runs* 以自动创建最小运行集合。运行（Run）是实现配置的任务。在 DFX 向导中，你可以创建任意数量的独立或相关运行，并为它们中的每一个选择不同的策略或约束集。
 
    现在 Vivado 已经自动创建了两个运行，以实现一个父配置（`config_mult`）和一个子配置（`config_add`）。请注意，自动生成运行的名称是不可编辑的。
-   
+
+   <img src="9.png" style="zoom:80%;" />
+
 10. 点击 *Next* 进入 *Summary* 页面，并点击 *Finish* 以完成设置并退出 DFX 向导。在 Vivado IDE 中，可以看到，设计运行窗口已更新。Vivado 为 `math` RM 添加了第二个 OOC 综合运行，并在父实现运行（`impl_1`）下创建了一个子实现运行（`child_0_impl_1`）。
+
+    <img src="10.png" style="zoom:80%;" />
 
 
 
@@ -190,7 +196,7 @@ Vivado IDE 中的 DFX 向导（Dynamic Function eXchange Wizard）用于集中�
 
 2. 在 Design Runs 窗口中，顶层设计的综合运行（`synth_1`）和实现运行（`impl_1`）被标记为已激活（active）。运行综合或者运行实现将会启动父子运行及其相关的 OOC 综合。你也可以右键单击子运行并选择 *Launch Runs* 来单独执行子运行。
 
-   这里我们单独运行综合。在 *Flow Navigator* 中，点击 *Run Synthesis* 以运行综合。这个操作将首先执行所有模块的 OOC 综合，然后再进行顶层设计的综合。
+   这里我们单独运行综合。在 Flow Navigator 中，点击 *Run Synthesis* 以运行综合。这个操作将首先执行所有模块的 OOC 综合，然后再进行顶层设计的综合。
 
 3. 当综合结束之后，选择 *Open Synthesized Design* 以打开综合后的设计，查看原理图。在顶层设计中，我们看到 Vivado 已经插入了一个 `dbg_hub` 实例，它的 `sl_*` 端口连接到顶层 VIO 调试核心。进入 `my_math` 层次结构，可见另一个 `dbg_hub`，其 `sl_*` 接口连接至内部的 ILA。此时 RM 为 `mult`，你将在其图中看到连接路径。
 
@@ -252,7 +258,7 @@ PR 配置分析工具通过 Tcl 控制台运行，具体操作如下：
 
 4. 对 `add` RM 下的两个 IP 执行相同操作：`my_add_ila` 和 `adder_ip`。后者有两个实例，但此操作只需要执行一次，因为该操作会自动应用到所有实例。
 
-5. 修改之后，这些综合已经过期（out-of-date），在 *Flow Navigator* 中选择 *Run Synthesis* 以重新运行综合。在弹出的对话框中选择 *Accept*。
+5. 修改之后，这些综合已经过期（out-of-date），在 Flow Navigator 中选择 *Run Synthesis* 以重新运行综合。在弹出的对话框中选择 *Accept*。
 
 6. 综合完成后，重新运行 `report_pr_configuration_analysis` 命令，并检查日志和结果。
 
@@ -262,7 +268,7 @@ PR 配置分析工具通过 Tcl 控制台运行，具体操作如下：
 
 完成综合与布局规划后，即可启动 Vivado 的实现流程，具体步骤如下：
 
-1. 在 *Flow Navigator* 中，选择 *Run Implementation* 以运行配置上的布局布线。
+1. 在 Flow Navigator 中，选择 *Run Implementation* 以运行配置上的布局布线。
 
    这个操作会首先为 `impl_1` 运行实现，然后为 `child_0_impl_1` 运行实现。除了运行这两个运行的布局布线任务之外，Vivado 还会自动执行以下特定于 DFX 的任务：
 
@@ -311,7 +317,7 @@ PR 配置分析工具通过 Tcl 控制台运行，具体操作如下：
 
    静态逻辑可以放置在扩展的布线区域中，即现在显示为黄色的剩余布线区域。
 
-5. 在 *Flow Navigator* 中，选择 *Report Timing Summary*，然后点击 *OK* 以分析设计时序。
+5. 在 Flow Navigator 中，选择 *Report Timing Summary*，然后点击 *OK* 以分析设计时序。
 
 6. 在 *Timing* 选项卡中，选择 *Design Timing Summary*，并点击 *Worst Negative Slack (WNS)* 以显示前十个最差时序的关键路径。双击第一个路径以打开对应的时序摘要。
 
@@ -376,7 +382,7 @@ PR 配置分析工具通过 Tcl 控制台运行，具体操作如下：
 
 完成所有配置的综合与实现后，即可生成对应的比特流。在生成比特流之前，Vivado 会默认执行 PR Verify 以比较两个配置，确保 DCP 中静态部分的一致性。以下是生成比特流的具体步骤：
 
-1. 在 *Flow Navigator* 中，点击 *Generate Bitstream*。Vivado 将自动进行：
+1. 在 Flow Navigator 中，点击 *Generate Bitstream*。Vivado 将自动进行：
    - 在激活的父运行中启动比特流生成；
    - 在已实现的子运行中运行检查然后生成比特流；
    - 为每个配置运行生成完整比特流和部分的比特流。
@@ -457,6 +463,8 @@ PR 配置分析工具通过 Tcl 控制台运行，具体操作如下：
     <img src="36.png" style="zoom:80%;" />
 
     再次地，Vivado 将会自动选择配对的 LTX 探针文件。点击 *Program* 以烧写。
+
+    <img src="37.png" style="zoom:80%;" />
 
 21. 在 VIO 仪表板上，按下暂停按钮。此时，输出值为 6。按下切换按钮后，输出值为 18。加法器将相同的数字加 3 次。
 
