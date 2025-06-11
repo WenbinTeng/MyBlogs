@@ -34,7 +34,7 @@ AXI4-Stream 规定了两条单向信号通道：
 | TSTRB | TDATA_WIDTH / 8 | Transmitter | 字节选通信号（每位对应一个字节）     |
 | TKEEP | TDATA_WIDTH / 8 | Transmitter | 字节传送控制信号（每位对应一个字节） |
 | TLAST | 1               | Transmitter | 最后一个数据标志                     |
-| TID   | ID_T_WIDTH      | Transmitter | 数据流标识 ID                        |
+| TID   | TID_WIDTH       | Transmitter | 数据流标识 ID                        |
 | TDEST | TDEST_WIDTH     | Transmitter | 提供数据流的路由信息                 |
 | TUSER | TUSER_WIDTH     | Transmitter | 用户定义信号                         |
 

@@ -68,6 +68,8 @@ AXI4 与 AXI-Lite 总线协议都包含了**五个**独立的通道，每条通�
 
 <img src="2-5.png" style="zoom:50%;" />
 
+<img src="2-6.png" style="zoom:75%;" />
+
 
 
 ### 2. AXI4 总线的握手机制
