@@ -19,7 +19,7 @@ tags:
 
 我们可以在 C/C++ 代码中以内联汇编形式编写 SVE 指令，或在汇编源文件中编写完整函数。例如：
 
-```c
+```assembly
         .globl  subtract_arrays         // -- Begin function 
         .p2align        2 
         .type   subtract_arrays,@function 
@@ -82,7 +82,7 @@ armclang -O3 -S -march=armv8-a+sve -o intrinsic_example.s intrinsic_example.c
 
 上述命令会生成以下汇编代码：
 
-```
+```assembly
 //instrinsic_example.s
 uaddlb_array:                           // @uaddlb_array
         .cfi_startproc
