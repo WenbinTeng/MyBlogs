@@ -5,6 +5,8 @@ tags:
 typora-root-url: ./arm-sme-overview
 ---
 
+# ARM SME 概述
+
 ARM 可扩展矩阵扩展（Scalable Matrix Extension，SME），是用于增强矩阵运算的指令集扩展。SME 是建立在可扩展向量扩展（Scalable Vector Extension，SVE）上的，新增了处理矩阵的能力。主要特性包括：
 
 - 两个向量之间的外积运算；
