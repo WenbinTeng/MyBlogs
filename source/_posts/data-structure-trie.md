@@ -91,7 +91,7 @@ public:
 private:
     std::vector<Trie*> children;
     bool end;
-}
+};
 ```
 
 
