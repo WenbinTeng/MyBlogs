@@ -202,11 +202,11 @@ Stream-HLS 默认生成的顶层接口为数组形式，这种接口通常对应
 在生成的 HLS 代码文件中，找到 `forward` 函数，这是顶层函数定义。在函数体头部添加以下接口约束：
 
 ```c++
-#pragma HLS interface mode=m_axi offset=slave port=<name> bundle=gmem0 max_widen_bitwidth=256
+#pragma HLS interface mode=m_axi offset=slave port=<name> bundle=gmem<number> max_widen_bitwidth=256
 ...
 ```
 
-将 `<name>` 替换为实际的数组名称，如 `v99`。所有数组接口都应该添加上述的接口约束。
+将 `<name>` 替换为实际的数组名称，如 `v99`。将 `<number>` 设置为不同的数字，以区别不同的 AXI 接口。所有数组接口都应该添加上述的接口约束。
 
 **添加 AXI-Lite 控制接口**
 
