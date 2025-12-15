@@ -16,7 +16,11 @@ tags:
 
 ### 1. GPT-2 模型概览
 
-GPT-2 模型是 OpenAI 发布的基于 Transformer Decoder 架构的大语言模型，提供 small-124M、medium-355M、large-774M、xl-1.5B 四种参数规模。这里我们选择 GPT-2 Medium 作为加速对象，其结构如下所示：
+GPT-2 模型是 OpenAI 发布的基于 Transformer Decoder 架构的大语言模型，提供 small-124M、medium-355M、large-774M、xl-1.5B 四种参数规模。
+
+![](fpga-llm-kernel/1.png)
+
+这里我们选择 GPT-2 Medium 作为加速对象，其结构以及各级参数如下所示：
 
 ```bash
 Model: GPT-2 Medium (355M)
