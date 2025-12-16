@@ -6,7 +6,9 @@ tags:
 
 # 如何使用 FPGA 推理大模型 (3) -  硬件平台搭建
 
-在上一部分中，我们已经完成了加速核心的编写，并通过 Vitis-HLS 将其综合为可以被 Vivado 使用的 IP。本部分将重点介绍如何在 Vivado 中搭建完整的硬件平台。
+在上一部分中，我们已经完成了加速核心的编写，并通过 Vitis-HLS 将其综合为可以被 Vivado 使用的 IP。
+
+本部分将重点介绍如何在 Vivado 中搭建完整的硬件平台。
 
 
 
@@ -97,6 +99,75 @@ XDMA 是 Xilinx 提供的用于主机和 FPGA 之间的 PCIe 通信 IP 核。当
 <img src="fpga-llm-hardware/7.png" style="width: 50%;" />
 
 <img src="fpga-llm-hardware/8.png" style="width: 50%;" />
+
+
+
+### 8. 加载 XDMA 驱动
+
+我们需要加载 XDMA 驱动才能让主机通过 PCIe 与 FPGA 进行通信。
+
+首先，下载 Xilinx 官方的 DMA 驱动仓库。
+
+```bash
+git clone https://github.com/Xilinx/dma_ip_drivers.git
+cd dma_ip_drivers/XDMA/linux-kernel
+```
+
+接着，按照 XDMA 文件夹下的 README，执行安装流程：
+
+```bash
+# compile and install kernel driver
+cd xdma
+sudo make install
+
+# compile tools
+cd ../tools
+sudo make
+```
+
+然后，加载驱动：
+
+```bash
+cd ../tests
+sudo ./load_driver.sh
+```
+
+```
+interrupt_selection .
+xdma                   90112  0
+Loading driver...insmod xdma.ko interrupt_mode=2 ...
+
+The Kernel module installed correctly and the xmda devices were recognized.
+DONE
+```
+
+如果驱动正确加载，则会出现“DONE”提示。
+
+我们来检查主机是否能正确识别 FPGA 设备。
+
+使用 `lspci` 命令来查看 PCIe 设备：
+
+```bash
+lspci | grep "Xilinx"
+```
+
+```bash
+27:00.0 Processing accelerators: Xilinx Corporation Device 50b4
+27:00.1 Processing accelerators: Xilinx Corporation Device 50b5
+```
+
+使用 `ls` 命令来查看 `/dev` 下的设备（FPGA 会被识别为字符设备）:
+
+```bash
+ls /dev/xdma*
+```
+
+```bash
+/dev/xdma0_c2h_0    /dev/xdma0_events_0  /dev/xdma0_events_10  /dev/xdma0_events_12  /dev/xdma0_events_14  /dev/xdma0_events_2  /dev/xdma0_events_4  /dev/xdma0_events_6  /dev/xdma0_events_8  /dev/xdma0_h2c_0
+/dev/xdma0_control  /dev/xdma0_events_1  /dev/xdma0_events_11  /dev/xdma0_events_13  /dev/xdma0_events_15  /dev/xdma0_events_3  /dev/xdma0_events_5  /dev/xdma0_events_7  /dev/xdma0_events_9
+```
+
+其中，`/dev/xdma0_c2h_0` 与 `/dev/xdma0_h2c_0` 是我们需要使用到的设备。
 
 
 
