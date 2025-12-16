@@ -74,6 +74,7 @@ $$
 $$
 
 
+
 ### 2. 使用 Stream-HLS 框架生成代码
 
 对于初学者而言，直接使用 HDL 或传统 HLS 编写加速核心往往门槛较高，且开发周期较长。这里我们介绍一个最新的基于 MLIR 的 HLS 代码生成框架：[Stream-HLS](https://github.com/UCLA-VAST/Stream-HLS/tree/main)，它可以将输入的 Pytorch 模型转换为 HLS 代码，并拥有不错的性能。
